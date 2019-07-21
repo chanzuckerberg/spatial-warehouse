@@ -1,0 +1,14 @@
+scanpy
+scipy
+scikit-image
+numpy
+h5py
+pandas
+anndata
+jupyterlab
+ipykernel
+xlrd
+xarray
+zarr
+dask[array]
+s3fs

@@ -1,7 +1,7 @@
 import s3fs
 import xarray as xr
 
-from .validate import validate_data_array
+from starspace.matrix.validate import validate_data_array
 
 
 def read_zarr(s3_url: str, validate=True) -> xr.DataArray:

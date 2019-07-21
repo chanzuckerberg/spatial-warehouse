@@ -1,3 +1,3 @@
 from .constants import *
-from .read import read_zarr
-from .write import write_zarr
+from starspace.matrix.read import read_zarr
+from starspace.matrix.write import write_zarr

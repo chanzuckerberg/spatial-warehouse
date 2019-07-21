@@ -1,8 +1,8 @@
 from warnings import warn
 
 import xarray as xr
-from .constants import ASSAYS, ATTRIBUTES, AXES, FEATURES, REGIONS
-from .exceptions import ValidationError
+from starspace.constants import ASSAYS, ATTRIBUTES, AXES, FEATURES, REGIONS
+from starspace.exceptions import ValidationError
 
 
 def validate_data_array(data_array: xr.DataArray) -> None:

@@ -23,8 +23,7 @@ import dask.array as da
 import pandas as pd
 import xarray as xr
 
-import starspace.write
-import starspace.read
+import starspace.matrix.read
 from starspace.constants import CHUNK_SIZE, AXES, REGIONS, FEATURES, ASSAYS, ATTRIBUTES
 
 directory = (
@@ -94,8 +93,8 @@ data_array = xr.DataArray(data=chunk_data, coords=coords, dims=dims, name=name, 
 # Convert to an xarray dataset and write to a zarr archive on s3.
 
 dataset = data_array.to_dataset()
-starspace.write.write_zarr(dataset, name)
+starspace.matrix.write.write_zarr(dataset, name)
 
-ds = starspace.read.read_zarr(
+ds = starspace.matrix.read.read_zarr(
     "s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic.zarr/"
 )

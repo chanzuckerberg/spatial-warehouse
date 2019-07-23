@@ -23,8 +23,9 @@ import dask.array as da
 import pandas as pd
 import xarray as xr
 
-import starspace.matrix.read
-from starspace.constants import CHUNK_SIZE, AXES, REGIONS, FEATURES, ASSAYS, ATTRIBUTES
+import starspace.read
+from starspace.matrix.constants import CHUNK_SIZE, AXES, REGIONS, FEATURES, ASSAYS, ATTRIBUTES
+from starspace.types import SpatialDataTypes
 
 directory = (
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
@@ -60,11 +61,13 @@ authors = ["Jeffrey R. Moffitt", "Dhananjay Bambah-Mukku", "Stephen W. Eichhorn"
            "Catherine Dulac", "Xiaowei Zhuang"]
 year = 2018
 organism = "mouse"
+sample_type = "hypothalamic pre-optic nucleus"
 publication_name = ("Molecular, spatial, and functional single-cell profiling of the hypothalamic "
                     "preoptic region")
 assay = ASSAYS.MERFISH
 attrs = {
     ATTRIBUTES.ASSAY: assay,
+    ATTRIBUTES.SAMPLE_TYPE: sample_type,
     ATTRIBUTES.AUTHORS: authors,
     ATTRIBUTES.YEAR: year,
     ATTRIBUTES.ORGANISM: organism
@@ -86,15 +89,15 @@ coords = {
     REGIONS.GROUP_ID: (AXES.REGIONS, group_id),
     REGIONS.ANNOTATION: (AXES.REGIONS, annotation)
 }
-dims = (AXES.REGIONS, AXES.FEATURES)
+dims = (AXES.REGIONS.value, AXES.FEATURES.value)
 data_array = xr.DataArray(data=chunk_data, coords=coords, dims=dims, name=name, attrs=attrs)
 
 ###################################################################################################
 # Convert to an xarray dataset and write to a zarr archive on s3.
 
 dataset = data_array.to_dataset()
-starspace.matrix.write.write_zarr(dataset, name)
+starspace.write_zarr(dataset, name, SpatialDataTypes.MATRIX)
 
-ds = starspace.matrix.read.read_zarr(
+ds = starspace.read.read_zarr(
     "s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic.zarr/"
 )

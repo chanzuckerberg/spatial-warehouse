@@ -10,5 +10,5 @@ ipykernel
 xlrd
 xarray
 zarr
-dask[array]
+dask[array, dataframe]
 s3fs

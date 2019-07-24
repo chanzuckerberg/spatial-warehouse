@@ -4,7 +4,8 @@ from warnings import warn
 import numpy as np
 import xarray as xr
 
-from starspace._constants import MATRIX_REQUIRED_REGIONS, MATRIX_OPTIONAL_REGIONS, MATRIX_AXES, MATRIX_REQUIRED_FEATURES, REQUIRED_ATTRIBUTES, ASSAYS
+from starspace._constants import MATRIX_REQUIRED_REGIONS, MATRIX_OPTIONAL_REGIONS, MATRIX_AXES, \
+    MATRIX_REQUIRED_FEATURES, REQUIRED_ATTRIBUTES, ASSAYS
 from starspace.exceptions import ValidationError
 
 
@@ -46,7 +47,8 @@ def validate(data: Union[xr.DataArray]) -> None:
             target_data = data.coords[unique_target]
             n_not_unique = target_data.shape[0] - np.unique(target_data).shape[0]
             if n_not_unique:
-                warn(f"{unique_target} field must be unique. Found {n_not_unique} duplicated values")
+                warn(f"{unique_target} field must be unique. "
+                     f"Found {n_not_unique} duplicated values")
                 n_failures += 1
 
     missing_attributes = set(REQUIRED_ATTRIBUTES) - set(data.attrs.keys())

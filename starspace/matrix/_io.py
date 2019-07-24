@@ -43,12 +43,13 @@ def write(
 
         url = url.replace(" ", '-')
         url = url.rstrip("/")
+        url = url.replace("s3://", "")
 
-        s3 = s3fs.S3FileSystem(profile_name=profile_name)  # TODO generalize (anon=True)
-        store = s3fs.S3Map(
-            root=f'starfish.data.output-warehouse/{url}/matrix.zarr',
-            s3=s3, check=False
-        )
+        if url.count("/") > 1:
+            raise ValueError("I haven't figured out how to write groups yet, this will fail.")
+        s3 = s3fs.S3FileSystem(profile_name=profile_name)
+        root = f"{url}.matrix.zarr"
+        store = s3fs.S3Map(root=root, s3=s3, check=False)
 
         data.to_zarr(store=store)
 

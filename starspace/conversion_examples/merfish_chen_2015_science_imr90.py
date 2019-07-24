@@ -32,7 +32,8 @@ directory = (
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
     "2015_chen_science_merfish"
 )
-data = pd.read_excel(os.path.join(directory, "140genesData.xlsx"))
+# data = pd.read_(os.path.join(directory, "140genesData.xlsx"))
+data = pd.read_csv("chen_spots.csv", index_col=0)
 name = "merfish chen 2015 science imr90"
 
 ###################################################################################################
@@ -123,13 +124,9 @@ dataset.attrs = attrs
 ###################################################################################################
 # Write the data to zarr on s3
 
-starspace.write_zarr(dataset, 'chen2.zarr', SpatialDataTypes.SPOTS)
-
-# verify the dataset is readable.
-starspace.read.read_zarr(
-    "s3://starfish.data.output-warehouse/merfish-chen-2015-science-hypothalamic-preoptic/"
-    "spots.zarr/",
-    object_type=SpatialDataTypes.SPOTS
+SpatialDataTypes.SPOTS.write(
+    dataset,
+    's3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/'
 )
 
 ###################################################################################################
@@ -167,12 +164,7 @@ data_array = xr.DataArray(
     data=matrix.values, coords=coords, dims=dims, name=name, attrs=dataset.attrs
 )
 
-attrs = data_array.attrs
-dataset = data_array.to_dataset()
-dataset.attrs = attrs
-starspace.write_zarr(
-    dataset,
-    url="s3://starfish.data.output-warehouse/merfish-chen-2015-science-hypothalamic-preoptic/" 
-        "matrix.zarr/",
-    object_type=SpatialDataTypes.MATRIX,
+SpatialDataTypes.MATRIX.write(
+    data_array,
+    url="s3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/"
 )

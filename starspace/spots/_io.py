@@ -13,15 +13,14 @@ def write(
         profile_name: str = "spacetx",
         validate_data: bool = True
 ) -> None:
-    """write a spatial data array to a zarr store
+    """Write spot data to a zarr store.
 
     Parameters
     ----------
     data : xr.Dataset
         the dataset to write.
     url : Union[Path, str]
-        name of the Dataset. Will be used as the name of the zarr archive. Any spaces will be
-        replaced with dashes.
+        file path or url to the zarr archive. Any spaces will be replaced with dashes.
     profile_name : str
         s3 profile to use for permissions
     validate_data : bool
@@ -36,14 +35,15 @@ def write(
 
     if url.startswith("s3://"):
 
-        url = url.replace(" ", '-')
+        url = url.replace(" ", "-")
         url = url.rstrip("/")
+        url = url.replace("s3://", "")
 
-        s3 = s3fs.S3FileSystem(profile_name=profile_name)  # TODO generalize (anon=True)
-        store = s3fs.S3Map(
-            root=f'starfish.data.output-warehouse/{url}/matrix.zarr',
-            s3=s3, check=False
-        )
+        if url.count("/") > 1:
+            raise ValueError("I haven't figured out how to write groups yet, this will fail.")
+        s3 = s3fs.S3FileSystem(profile_name=profile_name)
+        root = f"{url}.spots.zarr"
+        store = s3fs.S3Map(root=root, s3=s3, check=False)
 
         data.to_zarr(store=store)
 
@@ -52,7 +52,7 @@ def write(
 
 
 def read(url: Union[Path, str], validate_data: bool = True) -> xr.Dataset:
-    """reader that validates and returns a spatial dataset adhering to a simple spatial schema.
+    """Reader that validates and returns a spatial dataset adhering to a simple spatial schema.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ def read(url: Union[Path, str], validate_data: bool = True) -> xr.Dataset:
 
     Returns
     -------
-    xr.DataArray:
+    xr.Dataset:
         DataArray adhering to a simple spatial schema
 
     """

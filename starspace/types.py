@@ -18,3 +18,7 @@ class SpatialDataTypes(str, Enum):
     @property
     def write(self) -> Callable:
         return getattr(starspace, self).write
+
+    @property
+    def read(self) -> Callable:
+        return getattr(starspace, self).read

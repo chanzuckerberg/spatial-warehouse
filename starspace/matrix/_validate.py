@@ -42,7 +42,7 @@ def validate(data: Union[xr.DataArray]) -> None:
         warn(f"Required features metadata fields are missing: {missing_features_fields}")
         n_failures += 1
 
-    for unique_target in [MATRIX_REQUIRED_FEATURES.GENE_NAME, MATRIX_OPTIONAL_REGIONS.GROUP_ID]:
+    for unique_target in [MATRIX_REQUIRED_FEATURES.GENE_NAME]:
         if unique_target in data.coords.keys():
             target_data = data.coords[unique_target]
             n_not_unique = target_data.shape[0] - np.unique(target_data).shape[0]

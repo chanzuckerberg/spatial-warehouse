@@ -7,7 +7,7 @@ _REGION_ID = "region_id"
 
 _GENE_NAME = "gene_name"
 
-_MATRIX_CHUNK_SIZE = (5000, 1000)
+MATRIX_CHUNK_SIZE = (5000, 1000)
 
 
 class REQUIRED_ATTRIBUTES(str, Enum):

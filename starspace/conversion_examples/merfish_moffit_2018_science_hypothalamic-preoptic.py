@@ -20,11 +20,12 @@ Load the data
 import os
 
 import dask.array as da
+import numpy as np
 import pandas as pd
 import xarray as xr
 
-import starspace.read
-from starspace.matrix.constants import CHUNK_SIZE, AXES, REGIONS, FEATURES, ASSAYS, ATTRIBUTES
+from starspace._constants import REQUIRED_ATTRIBUTES, ASSAYS, MATRIX_AXES, \
+    MATRIX_REQUIRED_FEATURES, MATRIX_CHUNK_SIZE, MATRIX_REQUIRED_REGIONS, MATRIX_OPTIONAL_REGIONS
 from starspace.types import SpatialDataTypes
 
 directory = (
@@ -38,11 +39,11 @@ name = "merfish moffit 2018 science hypothalamic preoptic"
 # This data file is a cell x gene expression matrix that contains additional metadata as columns
 # of the matrix. Extract those extra columns and clean up the data file.
 
-annotation = data["Cell_class"]
-group_id = data["Neuron_cluster_ID"]
+annotation = np.array(data["Cell_class"], dtype="U")
+group_id = np.array(data["Neuron_cluster_ID"], dtype="U")
 x = data["Centroid_X"]
 y = data["Centroid_Y"]
-region_id = data["Cell_ID"]
+region_id = np.array(data["Cell_ID"], dtype="U")
 
 unstructured_field_names = ["Animal_ID", "Animal_sex", "Behavior", "Bregma"]
 unstructured_metadata = data[unstructured_field_names]
@@ -64,40 +65,41 @@ organism = "mouse"
 sample_type = "hypothalamic pre-optic nucleus"
 publication_name = ("Molecular, spatial, and functional single-cell profiling of the hypothalamic "
                     "preoptic region")
-assay = ASSAYS.MERFISH
+assay = ASSAYS.MERFISH.value
 attrs = {
-    ATTRIBUTES.ASSAY: assay,
-    ATTRIBUTES.SAMPLE_TYPE: sample_type,
-    ATTRIBUTES.AUTHORS: authors,
-    ATTRIBUTES.YEAR: year,
-    ATTRIBUTES.ORGANISM: organism
+    REQUIRED_ATTRIBUTES.ASSAY: assay,
+    REQUIRED_ATTRIBUTES.SAMPLE_TYPE: sample_type,
+    REQUIRED_ATTRIBUTES.AUTHORS: authors,
+    REQUIRED_ATTRIBUTES.YEAR: year,
+    REQUIRED_ATTRIBUTES.ORGANISM: organism
 }
 
 ###################################################################################################
 # Create the chunked dataset.
 
-chunk_data = da.from_array(expression_data.values, chunks=CHUNK_SIZE)
+chunk_data = da.from_array(expression_data.values, chunks=MATRIX_CHUNK_SIZE)
 
 ###################################################################################################
 # Wrap the dask array in an xarray, adding the metadata fields as "coordinates".
 
+# convert columns with object dtype into fixed-length strings
+
 coords = {
-    FEATURES.GENE_NAME: (AXES.FEATURES, gene_name),
-    REGIONS.X: (AXES.REGIONS, x),
-    REGIONS.Y: (AXES.REGIONS, y),
-    REGIONS.ID: (AXES.REGIONS, region_id),
-    REGIONS.GROUP_ID: (AXES.REGIONS, group_id),
-    REGIONS.ANNOTATION: (AXES.REGIONS, annotation)
+    MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES.value, gene_name),
+    MATRIX_REQUIRED_REGIONS.X_REGION: (MATRIX_AXES.REGIONS.value, x),
+    MATRIX_REQUIRED_REGIONS.Y_REGION: (MATRIX_AXES.REGIONS.value, y),
+    MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, region_id),
+    MATRIX_OPTIONAL_REGIONS.GROUP_ID: (MATRIX_AXES.REGIONS.value, group_id),
+    MATRIX_OPTIONAL_REGIONS.ANNOTATION: (MATRIX_AXES.REGIONS.value, annotation)
 }
-dims = (AXES.REGIONS.value, AXES.FEATURES.value)
+dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
 data_array = xr.DataArray(data=chunk_data, coords=coords, dims=dims, name=name, attrs=attrs)
+
 
 ###################################################################################################
 # Convert to an xarray dataset and write to a zarr archive on s3.
 
-dataset = data_array.to_dataset()
-starspace.write_zarr(dataset, name, SpatialDataTypes.MATRIX)
-
-ds = starspace.read.read_zarr(
-    "s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic.zarr/"
+SpatialDataTypes.MATRIX.write(
+    data_array,
+    url="s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic"
 )

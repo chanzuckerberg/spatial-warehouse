@@ -110,7 +110,8 @@ attrs = {
     REQUIRED_ATTRIBUTES.ORGANISM: organism
 }
 
-#TODO figure out how to convert to dask intermediate; should be possible.
+#TODO figure out how to convert to dask intermediate; should be possible. probably not very useful
+# though.
 
 ###################################################################################################
 # convert the dataframe into an xarray dataset

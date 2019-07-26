@@ -57,8 +57,8 @@ def validate(data: Union[xr.DataArray]) -> None:
         n_failures += 1
 
     assay = data.attrs[REQUIRED_ATTRIBUTES.ASSAY]
-    if assay not in ASSAYS.__members__:
-        warn(f"Invalid Assay type: {assay}. Assay must be one of {ASSAYS.__members__}")
+    if assay not in set(ASSAYS):
+        warn(f"Invalid Assay type: {assay}. Assay must be one of {set(ASSAYS)}")
         n_failures += 1
 
     if n_failures:

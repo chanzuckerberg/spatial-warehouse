@@ -98,7 +98,7 @@ authors = (
 )
 year = 2015
 organism = "human"
-sample_type = "IMR90 lung cell line"
+sample_type = "IMR90 lung fibroblast cell line"
 publication_name = "Spatially resolved, highly multiplexed RNA profiling in single cells"
 assay = ASSAYS.MERFISH.value
 notes = "cellID field from author data renamed per_slice_cell_id to reflect stored data"
@@ -116,11 +116,7 @@ attrs = {
 ###################################################################################################
 # convert the dataframe into an xarray dataset
 
-data.index.name = SPOTS_DIMS.SPOTS
-dataset = xr.Dataset.from_dataframe(data)
-
-# overwrite attrs
-dataset.attrs = attrs
+dataset = starspace.converters.dataframe2annotated_spots(data, attrs)
 
 ###################################################################################################
 # Write the data to zarr on s3
@@ -133,37 +129,7 @@ SpatialDataTypes.SPOTS.write(
 ###################################################################################################
 # Convert the xarray dataset to a matrix.
 
-data = dataset.to_dataframe()
-
-# TODO conversion of points to matrix may be something that we want to generalize and save to the
-#  package
-grouped = data.groupby([SPOTS_OPTIONAL_VARIABLES.REGION_ID.value, MATRIX_REQUIRED_FEATURES.GENE_NAME])
-matrix = grouped.count().iloc[:, 0].unstack("gene_name")
-
-group_columns = [
-    SPOTS_OPTIONAL_VARIABLES.REGION_ID,
-    SPOTS_OPTIONAL_VARIABLES.Y_REGION,
-    SPOTS_OPTIONAL_VARIABLES.X_REGION
-]
-region_ids_map = data.groupby(group_columns).size().reset_index().drop(0, axis=1)
-
-coords = {
-    MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES.value, matrix.columns),
-    MATRIX_REQUIRED_REGIONS.X_REGION: (
-        MATRIX_AXES.REGIONS.value,
-        region_ids_map.loc[matrix.index, MATRIX_REQUIRED_REGIONS.X_REGION]
-    ),
-    MATRIX_REQUIRED_REGIONS.Y_REGION: (
-        MATRIX_AXES.REGIONS.value,
-        region_ids_map.loc[matrix.index, MATRIX_REQUIRED_REGIONS.Y_REGION]
-    ),
-    MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, matrix.index),
-}
-dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
-
-data_array = xr.DataArray(
-    data=matrix.values, coords=coords, dims=dims, name=name, attrs=dataset.attrs
-)
+data_array = starspace.converters.spots2matrix(dataset)
 
 SpatialDataTypes.MATRIX.write(
     data_array,

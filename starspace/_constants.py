@@ -5,6 +5,8 @@ _Y_REGION = "y_region"
 _Z_REGION = "z_region"
 _REGION_ID = "region_id"
 
+_FIELD_OF_VIEW = "fov"
+
 _GENE_NAME = "gene_name"
 
 MATRIX_CHUNK_SIZE = (5000, 1000)
@@ -20,11 +22,14 @@ class REQUIRED_ATTRIBUTES(str, Enum):
 
 class OPTIONAL_ATTRIBUTES(str, Enum):
     PUBLICATION_NAME = "publication_name"
+    PUBLICATION_URL= "publication_url"
     NOTES = "notes"
 
 
 class ASSAYS(str, Enum):
     MERFISH = "MERFISH"
+    ISS = "In-situ Sequencing"
+    OSMFISH = "osmFISH"
 
 
 class SPOTS_DIMS(str, Enum):
@@ -44,6 +49,9 @@ class SPOTS_OPTIONAL_VARIABLES(str, Enum):
     Z_REGION = _Z_REGION
     Z_SPOT = "z_spot"
     QUALITY = "spot_quality"
+    RADIUS = "spot_radius"
+    FIELD_OF_VIEW = _FIELD_OF_VIEW
+    ROUND = "round"
 
 
 class MATRIX_REQUIRED_REGIONS(str, Enum):
@@ -56,6 +64,7 @@ class MATRIX_OPTIONAL_REGIONS(str, Enum):
     Z_REGION = _Z_REGION,
     ANNOTATION = "annotation"
     GROUP_ID = "group_id"
+    FIELD_OF_VIEW = _FIELD_OF_VIEW
 
 
 class MATRIX_AXES(str, Enum):

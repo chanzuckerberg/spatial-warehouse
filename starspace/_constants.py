@@ -4,6 +4,8 @@ _X_REGION = "x_region"
 _Y_REGION = "y_region"
 _Z_REGION = "z_region"
 _REGION_ID = "region_id"
+_ROUND = "round"
+_CHANNEL = "channel"
 
 _FIELD_OF_VIEW = "fov"
 
@@ -51,7 +53,7 @@ class SPOTS_OPTIONAL_VARIABLES(str, Enum):
     QUALITY = "spot_quality"
     RADIUS = "spot_radius"
     FIELD_OF_VIEW = _FIELD_OF_VIEW
-    ROUND = "round"
+    ROUND = _ROUND
 
 
 class MATRIX_REQUIRED_REGIONS(str, Enum):
@@ -62,9 +64,12 @@ class MATRIX_REQUIRED_REGIONS(str, Enum):
 
 class MATRIX_OPTIONAL_REGIONS(str, Enum):
     Z_REGION = _Z_REGION,
-    ANNOTATION = "annotation"
+    PHYS_ANNOTATION = "physical_annotation"
+    BIOL_ANNOTATION = "biological_annotation"
     GROUP_ID = "group_id"
     FIELD_OF_VIEW = _FIELD_OF_VIEW
+    AREA_PIXELS = "area_pixels"
+    AREA_UM2 = "area_um2"
 
 
 class MATRIX_AXES(str, Enum):
@@ -77,4 +82,5 @@ class MATRIX_REQUIRED_FEATURES(str, Enum):
 
 
 class MATRIX_OPTIONAL_FEATURES(str, Enum):
-    pass
+    ROUND = _ROUND
+    CHANNEL = _CHANNEL

@@ -1,10 +1,12 @@
 from enum import Enum
+from itertools import chain
 from typing import Dict
 
+import anndata
+import loompy
 import numpy as np
 import pandas as pd
 import xarray as xr
-from itertools import chain
 
 from starspace import SpatialDataTypes
 from starspace._constants import MATRIX_REQUIRED_FEATURES, MATRIX_AXES, \
@@ -103,3 +105,27 @@ def dataframe2annotated_spots(data: pd.DataFrame, attributes: Dict, validate=Tru
         SpatialDataTypes.SPOTS.validate(dataset)
 
     return dataset
+
+
+def spots2pandas(dataset: xr.Dataset) -> pd.DataFrame:
+    return dataset.to_dataframe()
+
+
+def spots2numpy(dataset: xr.Dataset) -> np.array:
+    return spots2pandas(dataset).to_records()
+
+
+def matrix2loom(data_array: xr.DataArray, loom_file_name) -> None:
+    row_attrs = {k: v.values for (k, v) in data_array[MATRIX_AXES.REGIONS].coords.items()}
+    col_attrs = {k: v.values for (k, v) in data_array[MATRIX_AXES.FEATURES].coords.items()}
+    file_attrs = data_array.attrs
+    loompy.create(
+        "loom_file_name", data_array.values, row_attrs, col_attrs, file_attrs=file_attrs
+    )
+
+
+def matrix2anndata(data_array: xr.DataArray) -> anndata.AnnData:
+    row_attrs = {k: v.values for (k, v) in data_array[MATRIX_AXES.REGIONS].coords.items()}
+    col_attrs = {k: v.values for (k, v) in data_array[MATRIX_AXES.FEATURES].coords.items()}
+    file_attrs = data_array.attrs
+    return anndata.AnnData(X=data_array.values, obs=row_attrs, var=col_attrs, uns=file_attrs)

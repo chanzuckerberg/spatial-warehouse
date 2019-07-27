@@ -24,13 +24,17 @@ from itertools import repeat
 from pathlib import Path
 
 import dask.array as da
+import xarray as xr
 import h5py
 import pandas as pd
 import numpy as np
+import loompy
 
 import starspace
 from starspace._constants import REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, \
-    SPOTS_OPTIONAL_VARIABLES, ASSAYS, OPTIONAL_ATTRIBUTES
+    SPOTS_OPTIONAL_VARIABLES, ASSAYS, OPTIONAL_ATTRIBUTES, MATRIX_REQUIRED_REGIONS, \
+    MATRIX_OPTIONAL_REGIONS, MATRIX_OPTIONAL_FEATURES, MATRIX_REQUIRED_FEATURES, \
+    MATRIX_AXES, MATRIX_CHUNK_SIZE
 
 dirpath = Path(os.path.expanduser(
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/osmFISH"
@@ -113,6 +117,52 @@ for region_id, array in region_data.items():
 # quick, make this massive thing a dask array!
 dask_label_image = da.from_array(label, chunks=(1000, 1000))
 
-dask_label_image.to_zarr()
+starspace.SpatialDataTypes.REGIONS.write(
+    dask_label_image,
+    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/",
+)
 
+###################################################################################################
+# load up the count matrix
 
+conn = loompy.connect(cells_file, mode="r")
+
+row_attrs = dict(conn.row_attrs)
+col_attrs = dict(conn.col_attrs)
+
+# region id should be int dtype
+col_attrs["CellID"] = col_attrs["CellID"].astype(int)
+
+dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
+
+coords = {
+    MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, col_attrs["CellID"]),
+    MATRIX_REQUIRED_REGIONS.X_REGION: (MATRIX_AXES.REGIONS.value, col_attrs["X"]),
+    MATRIX_REQUIRED_REGIONS.Y_REGION: (MATRIX_AXES.REGIONS.value, col_attrs["Y"]),
+    MATRIX_OPTIONAL_REGIONS.GROUP_ID: (MATRIX_AXES.REGIONS.value, col_attrs["ClusterID"]),
+    MATRIX_OPTIONAL_REGIONS.BIOL_ANNOTATION: (MATRIX_AXES.REGIONS.value, col_attrs["ClusterName"]),
+    MATRIX_OPTIONAL_REGIONS.PHYS_ANNOTATION: (MATRIX_AXES.REGIONS.value, col_attrs["Region"]),
+    MATRIX_OPTIONAL_REGIONS.AREA_PIXELS: (MATRIX_AXES.REGIONS.value, col_attrs["size_pix"]),
+    MATRIX_OPTIONAL_REGIONS.AREA_UM2: (MATRIX_AXES.REGIONS.value, col_attrs["size_um2"]),
+    "valid": (MATRIX_AXES.REGIONS.value, col_attrs["Valid"]),
+    "tsne_1": (MATRIX_AXES.REGIONS.value, col_attrs["_tSNE_1"]),
+    "tsne_2": (MATRIX_AXES.REGIONS.value, col_attrs["_tSNE_2"]),
+    MATRIX_OPTIONAL_FEATURES.CHANNEL: (MATRIX_AXES.FEATURES.value, row_attrs["Fluorophore"]),
+    MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES.value, row_attrs["Gene"]),
+    MATRIX_OPTIONAL_FEATURES.ROUND.value: (MATRIX_AXES.FEATURES.value, row_attrs["Hybridization"]),
+}
+
+data = da.from_array(conn[:, :].T, chunks=MATRIX_CHUNK_SIZE)
+
+data_array = xr.DataArray(data=data, coords=coords, dims=dims, name="matrix", attrs=attributes)
+
+# TODO this is broken on read.
+starspace.SpatialDataTypes.MATRIX.write(
+    data_array,
+    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/",
+)
+
+starspace.SpatialDataTypes.MATRIX.read(
+    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex."
+    "matrix.zarr",
+)

@@ -131,6 +131,7 @@ SpatialDataTypes.SPOTS.write(
 
 data_array = starspace.converters.spots2matrix(dataset)
 
+# todo this is broken on read ("regions keyerror -- enum problem?)
 SpatialDataTypes.MATRIX.write(
     data_array,
     url="s3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/"

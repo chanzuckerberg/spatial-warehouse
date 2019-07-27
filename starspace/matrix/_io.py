@@ -1,6 +1,9 @@
+from warnings import warn
+
 from pathlib import Path
 from typing import Union
 
+import numpy as np
 import xarray as xr
 import s3fs
 
@@ -34,6 +37,13 @@ def write(
     if validate_data:
         validate(data)
 
+    for key, array in data.coords.items():
+        if array.dtype == object:
+            warn(f"converting coordinate {key} with object dtype to string prior to upload.")
+        data[key].values = np.array(array, dtype="U")
+
+    # TODO here's how to dump a data_array to a dataset in a recoverable way:
+    #  https://github.com/pydata/xarray/blob/master/xarray/core/dataarray.py#L2055
     # attrs are lost in data array conversion, so stick them to the dataset that's created
     attrs = data.attrs
     data = data.to_dataset()
@@ -76,6 +86,10 @@ def read(url: Union[Path, str], validate_data: bool = True) -> xr.DataArray:
         DataArray adhering to a simple spatial schema
 
     """
+
+    # TODO here's how to get a data_array back https://github.com/pydata/xarray/blob/master/xarray/backends/api.py#L470
+    #  from a dataset with only one data variable
+
     if isinstance(url, Path):
         url = str(url)
 
@@ -90,6 +104,7 @@ def read(url: Union[Path, str], validate_data: bool = True) -> xr.DataArray:
     # reconstruct the array
     variables = iter(data_set.keys())
     data_array_name = next(variables)
+    import pdb; pdb.set_trace()
     coords = list(variables)
     data_array = xr.DataArray(
         data=data_set[data_array_name],

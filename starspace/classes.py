@@ -4,13 +4,14 @@ from enum import Enum
 from itertools import chain
 from pathlib import Path
 
+import dask.array as da
 import numpy as np
 import pandas as pd
 import xarray as xr
 import s3fs
 
 from ._constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
-MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES
+    MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES
 
 
 # todo figure out how to overwrite existing groups
@@ -165,13 +166,51 @@ class Spots(xr.Dataset):
         return spots
 
 
-class Regions(xr.Dataset):
+class Regions(xr.DataArray):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    @classmethod
+    def from_label_image(cls, label_image, dims, attrs, *args, **kwargs):
 
-    def save_zarr(self):
-        pass
+        if not isinstance(label_image, da):
+            label_image = da.from_array(label_image, chunks=(1000, 1000))
 
-    def load_zarr(self):
-        pass
+        # verify that dimensions are properly formatted
+        corrected_dims = tuple([dim.value if isinstance(dim, Enum) else dim for dim in dims])
+
+        if not corrected_dims == tuple(REGIONS_AXES):
+            raise ValueError(f"matrix axes must be {tuple(REGIONS_AXES)}.")
+
+        # verify attributes are present
+        for v in REQUIRED_ATTRIBUTES:
+            if v not in attrs:
+                raise ValueError(f"missing required attribute {v}")
+
+        cls(label_image, dims=dims, attrs=attrs)
+
+    def save_zarr(self, url, profile_name):
+        if self.name is None:
+            dataset = self.to_dataset(name=MATRIX_NAME)
+        else:
+            dataset = self.to_dataset()
+
+        _save_zarr(dataset, url, profile_name)
+
+    @classmethod
+    def load_zarr(cls, url):
+        dataset = _load_zarr(url)
+
+        if len(dataset.data_vars) != 1:
+            raise ValueError('Given file dataset contains more than one data '
+                             'variable. Please read with xarray.open_dataset and '
+                             'then select the variable you want.')
+        else:
+            data_array, = dataset.data_vars.values()
+
+        data_array._file_obj = dataset._file_obj
+
+        # Reset names if they were changed during saving
+        # to ensure that we can 'roundtrip' perfectly
+        if data_array.name == MATRIX_NAME:
+            data_array.name = None
+
+        return cls(data_array)

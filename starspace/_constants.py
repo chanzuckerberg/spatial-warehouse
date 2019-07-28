@@ -1,5 +1,8 @@
 from enum import Enum
 
+###################################################################################################
+# General
+
 _X_REGION = "x_region"
 _Y_REGION = "y_region"
 _Z_REGION = "z_region"
@@ -14,6 +17,9 @@ _GENE_NAME = "gene_name"
 MATRIX_CHUNK_SIZE = (5000, 1000)
 MATRIX_NAME = "matrix"
 
+
+###################################################################################################
+# Attributes
 
 class REQUIRED_ATTRIBUTES(str, Enum):
     ORGANISM = "organism"
@@ -34,6 +40,8 @@ class ASSAYS(str, Enum):
     ISS = "In-situ Sequencing"
     OSMFISH = "osmFISH"
 
+###################################################################################################
+# Spots
 
 class SPOTS_AXES(str, Enum):
     SPOTS = "spots"
@@ -55,6 +63,8 @@ class SPOTS_OPTIONAL_VARIABLES(str, Enum):
     FIELD_OF_VIEW = _FIELD_OF_VIEW
     ROUND = _ROUND
 
+###################################################################################################
+# Matrix
 
 class MATRIX_REQUIRED_REGIONS(str, Enum):
     REGION_ID = _REGION_ID,
@@ -84,3 +94,11 @@ class MATRIX_REQUIRED_FEATURES(str, Enum):
 class MATRIX_OPTIONAL_FEATURES(str, Enum):
     ROUND = _ROUND
     CHANNEL = _CHANNEL
+
+
+###################################################################################################
+# Regions
+
+class REGIONS_AXES(str, Enum):
+    X_REGION = _X_REGION
+    Y_REGION = _Y_REGION

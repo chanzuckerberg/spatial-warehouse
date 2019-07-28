@@ -12,6 +12,7 @@ _FIELD_OF_VIEW = "fov"
 _GENE_NAME = "gene_name"
 
 MATRIX_CHUNK_SIZE = (5000, 1000)
+MATRIX_NAME = "matrix"
 
 
 class REQUIRED_ATTRIBUTES(str, Enum):
@@ -34,9 +35,8 @@ class ASSAYS(str, Enum):
     OSMFISH = "osmFISH"
 
 
-class SPOTS_DIMS(str, Enum):
+class SPOTS_AXES(str, Enum):
     SPOTS = "spots"
-
 
 class SPOTS_REQUIRED_VARIABLES(str, Enum):
     GENE_NAME = _GENE_NAME

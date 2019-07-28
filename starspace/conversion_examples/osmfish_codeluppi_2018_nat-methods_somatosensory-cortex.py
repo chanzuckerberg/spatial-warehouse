@@ -136,20 +136,20 @@ col_attrs["CellID"] = col_attrs["CellID"].astype(int)
 dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
 
 coords = {
-    MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, col_attrs["CellID"]),
-    MATRIX_REQUIRED_REGIONS.X_REGION: (MATRIX_AXES.REGIONS.value, col_attrs["X"]),
-    MATRIX_REQUIRED_REGIONS.Y_REGION: (MATRIX_AXES.REGIONS.value, col_attrs["Y"]),
-    MATRIX_OPTIONAL_REGIONS.GROUP_ID: (MATRIX_AXES.REGIONS.value, col_attrs["ClusterID"]),
-    MATRIX_OPTIONAL_REGIONS.BIOL_ANNOTATION: (MATRIX_AXES.REGIONS.value, col_attrs["ClusterName"]),
-    MATRIX_OPTIONAL_REGIONS.PHYS_ANNOTATION: (MATRIX_AXES.REGIONS.value, col_attrs["Region"]),
-    MATRIX_OPTIONAL_REGIONS.AREA_PIXELS: (MATRIX_AXES.REGIONS.value, col_attrs["size_pix"]),
-    MATRIX_OPTIONAL_REGIONS.AREA_UM2: (MATRIX_AXES.REGIONS.value, col_attrs["size_um2"]),
-    "valid": (MATRIX_AXES.REGIONS.value, col_attrs["Valid"]),
-    "tsne_1": (MATRIX_AXES.REGIONS.value, col_attrs["_tSNE_1"]),
-    "tsne_2": (MATRIX_AXES.REGIONS.value, col_attrs["_tSNE_2"]),
-    MATRIX_OPTIONAL_FEATURES.CHANNEL: (MATRIX_AXES.FEATURES.value, row_attrs["Fluorophore"]),
-    MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES.value, row_attrs["Gene"]),
-    MATRIX_OPTIONAL_FEATURES.ROUND.value: (MATRIX_AXES.FEATURES.value, row_attrs["Hybridization"]),
+    MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS, col_attrs["CellID"]),
+    MATRIX_REQUIRED_REGIONS.X_REGION: (MATRIX_AXES.REGIONS, col_attrs["X"]),
+    MATRIX_REQUIRED_REGIONS.Y_REGION: (MATRIX_AXES.REGIONS, col_attrs["Y"]),
+    MATRIX_OPTIONAL_REGIONS.GROUP_ID: (MATRIX_AXES.REGIONS, col_attrs["ClusterID"]),
+    MATRIX_OPTIONAL_REGIONS.BIOL_ANNOTATION: (MATRIX_AXES.REGIONS, col_attrs["ClusterName"]),
+    MATRIX_OPTIONAL_REGIONS.PHYS_ANNOTATION: (MATRIX_AXES.REGIONS, col_attrs["Region"]),
+    MATRIX_OPTIONAL_REGIONS.AREA_PIXELS: (MATRIX_AXES.REGIONS, col_attrs["size_pix"]),
+    MATRIX_OPTIONAL_REGIONS.AREA_UM2: (MATRIX_AXES.REGIONS, col_attrs["size_um2"]),
+    "valid": (MATRIX_AXES.REGIONS, col_attrs["Valid"]),
+    "tsne_1": (MATRIX_AXES.REGIONS, col_attrs["_tSNE_1"]),
+    "tsne_2": (MATRIX_AXES.REGIONS, col_attrs["_tSNE_2"]),
+    MATRIX_OPTIONAL_FEATURES.CHANNEL: (MATRIX_AXES.FEATURES, row_attrs["Fluorophore"]),
+    MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES, row_attrs["Gene"]),
+    MATRIX_OPTIONAL_FEATURES.ROUND.value: (MATRIX_AXES.FEATURES, row_attrs["Hybridization"]),
 }
 
 data = da.from_array(conn[:, :].T, chunks=MATRIX_CHUNK_SIZE)

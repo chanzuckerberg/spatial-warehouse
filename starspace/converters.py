@@ -11,7 +11,7 @@ import xarray as xr
 from starspace import SpatialDataTypes
 from starspace._constants import MATRIX_REQUIRED_FEATURES, MATRIX_AXES, \
     MATRIX_REQUIRED_REGIONS
-from starspace._constants import SPOTS_DIMS
+from starspace._constants import SPOTS_AXES
 
 
 def spots2matrix(dataset: xr.Dataset):
@@ -78,7 +78,7 @@ def dataframe2annotated_spots(data: pd.DataFrame, attributes: Dict, validate=Tru
     object
     """
 
-    data.index.name = SPOTS_DIMS.SPOTS.value
+    data.index.name = SPOTS_AXES.SPOTS.value
 
     # ensure attributes are strings
     string_attributes = {}

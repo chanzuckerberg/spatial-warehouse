@@ -1,19 +1,19 @@
 """
-Spatial organization of the somatosensory cortex revealed by cyclic smFISH
+spatial organization of the somatosensory cortex revealed by cyclic smfish
 ============================================================================================
 
-Simone Codeluppi, Lars E. Borm, Amit Zeisel, Gioele La Manno, Josina A. van Lunteren,
-Camilla I. Svensson, Sten Linnarsson
+simone codeluppi, lars e. borm, amit zeisel, gioele la manno, josina a. van lunteren,
+camilla i. svensson, sten linnarsson
 
-This publication can be found at https://www.nature.com/articles/s41592-018-0175-z and the
-data referenced below can be downloaded from http://linnarssonlab.org/osmFISH/
+this publication can be found at https://www.nature.com/articles/s41592-018-0175-z and the
+data referenced below can be downloaded from http://linnarssonlab.org/osmfish/
 
-Checklist:
+checklist:
 - [x] point locations
 - [x] cell locations
 - [x] cell x gene expression matrix
 
-Load the data
+load the data
 -------------
 """
 

@@ -1,10 +1,8 @@
-# TODO replace this with napari
-
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
 
-from ._constants import SPOTS_REQUIRED_VARIABLES
+from .constants import SPOTS_REQUIRED_VARIABLES
 
 
 def plot_spots(spots: xr.Dataset):

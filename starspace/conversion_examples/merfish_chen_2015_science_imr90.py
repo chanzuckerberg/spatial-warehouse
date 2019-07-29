@@ -19,21 +19,15 @@ Load the data
 import os
 
 import pandas as pd
-import xarray as xr
 
 import starspace
-from starspace._constants import (
-    SPOTS_REQUIRED_VARIABLES, MATRIX_REQUIRED_REGIONS, REQUIRED_ATTRIBUTES, ASSAYS, MATRIX_REQUIRED_FEATURES,
-    MATRIX_AXES, SPOTS_OPTIONAL_VARIABLES, SPOTS_DIMS
-)
-from starspace.types import SpatialDataTypes
+from starspace.constants import *
 
 directory = (
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
     "2015_chen_science_merfish"
 )
-# data = pd.read_(os.path.join(directory, "140genesData.xlsx"))
-data = pd.read_csv("chen_spots.csv", index_col=0)
+data = pd.read_excel(os.path.join(directory, "140genesData.xlsx"))
 name = "merfish chen 2015 science imr90"
 
 ###################################################################################################
@@ -93,46 +87,36 @@ data[SPOTS_OPTIONAL_VARIABLES.REGION_ID] = region_ids.values
 
 ###################################################################################################
 # Write down some important metadata from the publication.
-authors = (
-    "Kok Hao Chen", "Alistair N. Boettiger", "Jeffrey R. Moffitt", "Siyuan Wang", "Xiaowei Zhuang"
-)
-year = 2015
-organism = "human"
-sample_type = "IMR90 lung fibroblast cell line"
-publication_name = "Spatially resolved, highly multiplexed RNA profiling in single cells"
-assay = ASSAYS.MERFISH.value
-notes = "cellID field from author data renamed per_slice_cell_id to reflect stored data"
 attrs = {
-    REQUIRED_ATTRIBUTES.ASSAY: assay,
-    REQUIRED_ATTRIBUTES.SAMPLE_TYPE: sample_type,
-    REQUIRED_ATTRIBUTES.AUTHORS: authors,
-    REQUIRED_ATTRIBUTES.YEAR: year,
-    REQUIRED_ATTRIBUTES.ORGANISM: organism
+    REQUIRED_ATTRIBUTES.ASSAY: ASSAYS.MERFISH,
+    REQUIRED_ATTRIBUTES.SAMPLE_TYPE: "IMR90 lung fibroblast cell line",
+    REQUIRED_ATTRIBUTES.AUTHORS: (
+        "Kok Hao Chen", "Alistair N. Boettiger", "Jeffrey R. Moffitt", "Siyuan Wang",
+        "Xiaowei Zhuang"
+    ),
+    REQUIRED_ATTRIBUTES.YEAR: 2015,
+    REQUIRED_ATTRIBUTES.ORGANISM: "human",
+    OPTIONAL_ATTRIBUTES.NOTES: (
+        "cellID field from author data renamed per_slice_cell_id to reflect stored data"
+    )
 }
-
-#TODO figure out how to convert to dask intermediate; should be possible. probably not very useful
-# though.
 
 ###################################################################################################
 # convert the dataframe into an xarray dataset
 
-dataset = starspace.converters.dataframe2annotated_spots(data, attrs)
+spots = starspace.Spots.from_spot_data(data, attrs)
 
 ###################################################################################################
 # Write the data to zarr on s3
 
-SpatialDataTypes.SPOTS.write(
-    dataset,
-    's3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/'
-)
+s3_url = "s3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/"
+url = "merfish-chen-2015-science-imr90/"
+spots.save_zarr(url)
 
 ###################################################################################################
 # Convert the xarray dataset to a matrix.
 
-data_array = starspace.converters.spots2matrix(dataset)
+matrix = spots.to_spatial_matrix()
+matrix.save_zarr(url)
 
-# todo this is broken on read ("regions keyerror -- enum problem?)
-SpatialDataTypes.MATRIX.write(
-    data_array,
-    url="s3://starfish.data.output-warehouse/merfish-chen-2015-science-imr90/"
-)
+

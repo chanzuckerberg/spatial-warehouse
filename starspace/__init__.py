@@ -1,1 +1,1 @@
-from . import converters
+from .classes import Spots, Matrix, Regions

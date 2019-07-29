@@ -16,13 +16,9 @@ Checklist:
 from pathlib import Path
 
 import pandas as pd
-import numpy as np
-import xarray as xr
 
 import starspace
-from starspace._constants import REQUIRED_ATTRIBUTES, OPTIONAL_ATTRIBUTES, \
-    SPOTS_REQUIRED_VARIABLES, SPOTS_OPTIONAL_VARIABLES, ASSAYS
-from starspace import SpatialDataTypes
+from starspace.constants import *
 
 dirpath = Path("~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/ISS/"
                "2019_liu_natscireports_pancreas"
@@ -78,7 +74,6 @@ column_map = {
 
 columns = [column_map[c] for c in rna_data.columns]
 rna_data.columns = columns
-rna_data.index.name = "spots"
 
 attributes = {
     REQUIRED_ATTRIBUTES.ASSAY: ASSAYS.ISS.value,
@@ -94,27 +89,16 @@ attributes = {
     OPTIONAL_ATTRIBUTES.PUBLICATION_URL: "https://www.nature.com/articles/s41598-019-41951-2"
 }
 
-dataset = xr.Dataset(rna_data)
-dataset.attrs = attributes
+spots = starspace.Spots.from_spot_data(rna_data, attributes)
 
-# convert object columns to fixed-width strings
-dataset[SPOTS_REQUIRED_VARIABLES.GENE_NAME].values = np.array(
-    dataset[SPOTS_REQUIRED_VARIABLES.GENE_NAME], dtype="U"
-)
-dataset["barcode_letter"].values = np.array(dataset["barcode_letter"], dtype="U")
 
-SpatialDataTypes.SPOTS.write(
-    dataset,
-    "s3://starfish.data.output-warehouse/iss_liu_2019_nat-sci-reports_pancreas-dev/"
-)
+s3_url = "s3://starfish.data.output-warehouse/iss_liu_2019_nat-sci-reports_pancreas-dev/"
+url = "iss_liu_2019_nat-sci-reports_pancreas-dev/"
+spots.save_zarr(url=url)
+
 
 ##################################################################################################
 # we have the needed information to pivot into a matrix, too
 
-matrix = starspace.converters.spots2matrix(dataset)
-
-SpatialDataTypes.MATRIX.write(
-    matrix,
-    "s3://starfish.data.output-warehouse/iss_liu_2019_nat-sci-reports_pancreas-dev/"
-)
-
+matrix = spots.to_spatial_matrix()
+matrix.save_zarr(url=url)

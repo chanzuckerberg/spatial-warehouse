@@ -11,34 +11,35 @@ import pandas as pd
 import s3fs
 import xarray as xr
 
-from ._constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
+from .constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
     MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES, \
-    REGIONS_NAME
+    REGIONS_NAME, SPOTS_NAME
 
 
 # todo figure out how to overwrite existing groups
 # todo figure out how to write to s3fs with groups
-def _save_zarr(dataset: xr.Dataset, url: str, profile_name: str) -> None:
+def _save_zarr(dataset: xr.Dataset, url: str, profile_name: str, suffix: str) -> None:
 
     if isinstance(url, Path):
         url = str(url)
 
+    url = url.rstrip("/")
+
     if url.startswith("s3://"):
 
         url = url.replace(" ", '-')
-        url = url.rstrip("/")
         url = url.replace("s3://", "")
 
         if url.count("/") > 1:
             raise ValueError("I haven't figured out how to write groups yet, this will fail.")
         s3 = s3fs.S3FileSystem(profile_name=profile_name)
-        root = f"{url}.matrix.zarr"
+        root = f"{url}.{suffix}.zarr"
         store = s3fs.S3Map(root=root, s3=s3, check=False)
 
         dataset.to_zarr(store=store)
 
     else:  # assume local
-        dataset.to_zarr(url)
+        dataset.to_zarr(f"{url}.{suffix}.zarr")
 
 
 def _load_zarr(url: str) -> xr.Dataset:
@@ -96,6 +97,10 @@ class Matrix(xr.DataArray):
             if v not in attrs:
                 raise ValueError(f"missing required attribute {v}")
 
+        # convert to dask
+        if not isinstance(data, da.core.Array):
+            data = da.from_array(data, chunks=(1000, 1000))
+
         return cls(
             data=data, dims=corrected_dims, coords=corrected_coords, attrs=attrs, *args, **kwargs
         )
@@ -106,7 +111,7 @@ class Matrix(xr.DataArray):
         else:
             dataset = self.to_dataset()
 
-        _save_zarr(dataset, url, profile_name)
+        _save_zarr(dataset, url, profile_name, suffix=MATRIX_NAME)
 
     @classmethod
     def load_zarr(cls, url) -> "Matrix":
@@ -128,6 +133,21 @@ class Matrix(xr.DataArray):
             data_array.name = None
 
         return cls(data_array)
+
+    def to_loom(self, loom_file_name) -> None:
+        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
+        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
+        file_attrs = self.attrs
+        loompy.create(
+            loom_file_name, self.values, row_attrs, col_attrs, file_attrs=file_attrs
+        )
+
+    def to_anndata(self) -> anndata.AnnData:
+        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
+        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
+        file_attrs = self.attrs
+
+        return anndata.AnnData(X=self.values, obs=row_attrs, var=col_attrs, uns=file_attrs)
 
 
 class Spots(xr.Dataset):
@@ -157,7 +177,7 @@ class Spots(xr.Dataset):
         return dataset
 
     def save_zarr(self, url: str, profile_name: str = "spacetx"):
-        _save_zarr(self, url, profile_name)
+        _save_zarr(self, url, profile_name, suffix=SPOTS_NAME)
 
     @classmethod
     def load_zarr(cls, url: str) -> "Spots":
@@ -168,20 +188,6 @@ class Spots(xr.Dataset):
 
     def to_records(self) -> np.array:
         return self.to_dataframe().to_records()
-
-    def to_loom(self, loom_file_name) -> None:
-        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
-        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
-        file_attrs = self.attrs
-        loompy.create(
-            "loom_file_name", self.values, row_attrs, col_attrs, file_attrs=file_attrs
-        )
-
-    def to_anndata(self) -> anndata.AnnData:
-        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
-        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
-        file_attrs = self.attrs
-        return anndata.AnnData(X=self.values, obs=row_attrs, var=col_attrs, uns=file_attrs)
 
     def to_spatial_matrix(self) -> "Matrix":
         """convert spots to a matrix, provided required optional annotations are present"""
@@ -218,7 +224,7 @@ class Spots(xr.Dataset):
         }
         dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
 
-        data_array = Matrix(
+        data_array = xr.DataArray(
             data=matrix.values, coords=coords, dims=dims, attrs=self.attrs, name="matrix"
         )
 
@@ -269,7 +275,7 @@ class Regions(xr.DataArray):
         else:
             dataset = self.to_dataset()
 
-        _save_zarr(dataset, url, profile_name)
+        _save_zarr(dataset, url, profile_name, suffix=REGIONS_NAME)
 
     @classmethod
     def load_zarr(cls, url):

@@ -27,8 +27,7 @@ import pandas as pd
 import numpy as np
 
 import starspace
-from starspace._constants import ASSAYS, REQUIRED_ATTRIBUTES, OPTIONAL_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, \
-    SPOTS_OPTIONAL_VARIABLES
+from starspace.constants import *
 
 data_path = Path("~/Downloads/") / "published_MERFISH_decoded_results.csv"
 
@@ -55,7 +54,6 @@ column_map = {
 
 columns = [column_map[c] for c in data.columns]
 data.columns = columns
-data.index.name = "spots"
 
 attributes = {
     REQUIRED_ATTRIBUTES.ORGANISM: "human",
@@ -73,10 +71,7 @@ attributes = {
     OPTIONAL_ATTRIBUTES.PUBLICATION_URL: "https://www.pnas.org/content/113/39/11046"
 }
 
-dataset = starspace.converters.dataframe2annotated_spots(data, attributes)
-
-starspace.SpatialDataTypes.SPOTS.write(
-    dataset,
-    url="s3://starfish.data.output-warehouse/merfish-moffit-2016-pnas-u2os/"
-)
-
+spots = starspace.Spots.from_spot_data(data, attributes)
+s3_url = "s3://starfish.data.output-warehouse/merfish-moffit-2016-pnas-u2os/"
+url = "merfish-moffit-2016-pnas-u2os/"
+spots.save_zarr(url)

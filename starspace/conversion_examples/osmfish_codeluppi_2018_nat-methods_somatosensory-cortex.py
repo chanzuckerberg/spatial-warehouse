@@ -31,10 +31,7 @@ import numpy as np
 import loompy
 
 import starspace
-from starspace._constants import REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, \
-    SPOTS_OPTIONAL_VARIABLES, ASSAYS, OPTIONAL_ATTRIBUTES, MATRIX_REQUIRED_REGIONS, \
-    MATRIX_OPTIONAL_REGIONS, MATRIX_OPTIONAL_FEATURES, MATRIX_REQUIRED_FEATURES, \
-    MATRIX_AXES, MATRIX_CHUNK_SIZE
+from starspace.constants import *
 
 dirpath = Path(os.path.expanduser(
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/osmFISH"
@@ -51,7 +48,7 @@ spots_data = h5py.File(spots_file, "r")
 gene = []
 x = []
 y = []
-round = []
+imaging_round = []
 pattern = r"^(.*?)_Hybridization(\d*?)$"
 for k in spots_data.keys():
     gene_, round_ = re.match(pattern, k).groups()
@@ -59,16 +56,16 @@ for k in spots_data.keys():
     x.extend(gene_data[:, 0])
     y.extend(gene_data[:, 1])
     gene.extend(repeat(gene_, gene_data.shape[0]))
-    round.extend(repeat(int(round_), gene_data.shape[0]))
+    imaging_round.extend(repeat(int(round_), gene_data.shape[0]))
 
 spots_data.close()
 
 # build the spot information
-spots = pd.DataFrame({
+spot_data = pd.DataFrame({
     SPOTS_REQUIRED_VARIABLES.GENE_NAME: gene,
     SPOTS_REQUIRED_VARIABLES.X_SPOT: x,
     SPOTS_REQUIRED_VARIABLES.Y_SPOT: y,
-    SPOTS_OPTIONAL_VARIABLES.ROUND: round,
+    SPOTS_OPTIONAL_VARIABLES.ROUND: imaging_round,
 })
 
 # construct the attributes
@@ -87,12 +84,12 @@ attributes = {
     OPTIONAL_ATTRIBUTES.PUBLICATION_URL: "https://www.nature.com/articles/s41592-018-0175-z"
 }
 
-dataset = starspace.converters.dataframe2annotated_spots(spots, attributes=attributes)
-
-dataset = starspace.SpatialDataTypes.SPOTS.write(
-    dataset,
-    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/",
+spots = starspace.Spots.from_spot_data(spot_data, attrs=attributes)
+s3_url = (
+    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/"
 )
+url = "osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/"
+spots.save_zarr(url=url)
 
 ###################################################################################################
 # load the region information; we're gonna be lazy and just create a label image. Makes for simple
@@ -103,8 +100,8 @@ with open(regions_file, "rb") as f:
 
 # find the extent of the images from the spots and the region data
 
-x_min, x_max = np.percentile(spots[SPOTS_REQUIRED_VARIABLES.X_SPOT], [0, 100])
-y_min, y_max = np.percentile(spots[SPOTS_REQUIRED_VARIABLES.Y_SPOT], [0, 100])
+x_min, x_max = np.percentile(spot_data[SPOTS_REQUIRED_VARIABLES.X_SPOT], [0, 100])
+y_min, y_max = np.percentile(spot_data[SPOTS_REQUIRED_VARIABLES.Y_SPOT], [0, 100])
 
 label = np.empty((int(x_max) + 1, int(y_max) + 1), dtype=np.int16)
 
@@ -114,13 +111,10 @@ for region_id, array in region_data.items():
     y = array[:, 1]
     label[x, y] = region_id
 
-# quick, make this massive thing a dask array!
-dask_label_image = da.from_array(label, chunks=(1000, 1000))
+dims = tuple(REGIONS_AXES)
 
-starspace.SpatialDataTypes.REGIONS.write(
-    dask_label_image,
-    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/",
-)
+regions = starspace.Regions.from_label_image(label, dims=dims, attrs=attributes)
+regions.save_zarr(url=url)
 
 ###################################################################################################
 # load up the count matrix
@@ -154,15 +148,8 @@ coords = {
 
 data = da.from_array(conn[:, :].T, chunks=MATRIX_CHUNK_SIZE)
 
-data_array = xr.DataArray(data=data, coords=coords, dims=dims, name="matrix", attrs=attributes)
-
-# TODO this is broken on read.
-starspace.SpatialDataTypes.MATRIX.write(
-    data_array,
-    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex/",
+matrix = starspace.Matrix.from_expression_data(
+    data=data, coords=coords, dims=dims, name="matrix", attrs=attributes
 )
+matrix.save_zarr(url=url)
 
-starspace.SpatialDataTypes.MATRIX.read(
-    "s3://starfish.data.output-warehouse/osmfish-codeluppi-2018-nat-methods-somatosensory-cortex."
-    "matrix.zarr",
-)

@@ -41,6 +41,9 @@ class ASSAYS(str, Enum):
 ###################################################################################################
 # Spots
 
+SPOTS_NAME = "spots"
+
+
 class SPOTS_AXES(str, Enum):
     SPOTS = "spots"
 

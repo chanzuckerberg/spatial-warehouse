@@ -22,11 +22,9 @@ import os
 import dask.array as da
 import numpy as np
 import pandas as pd
-import xarray as xr
 
-from starspace._constants import REQUIRED_ATTRIBUTES, ASSAYS, MATRIX_AXES, \
-    MATRIX_REQUIRED_FEATURES, MATRIX_CHUNK_SIZE, MATRIX_REQUIRED_REGIONS, MATRIX_OPTIONAL_REGIONS
-from starspace.types import SpatialDataTypes
+import starspace
+from starspace.constants import *
 
 directory = (
     "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
@@ -57,21 +55,21 @@ gene_name = [v.lower() for v in expression_data.columns]
 ###################################################################################################
 # Write down some important metadata from the publication.
 
-authors = ["Jeffrey R. Moffitt", "Dhananjay Bambah-Mukku", "Stephen W. Eichhorn", "Eric Vaughn",
-           "Karthik Shekhar", "Julio D. Perez", "Nimrod D. Rubinstein", "Junjie Hao", "Aviv Regev",
-           "Catherine Dulac", "Xiaowei Zhuang"]
-year = 2018
-organism = "mouse"
-sample_type = "hypothalamic pre-optic nucleus"
-publication_name = ("Molecular, spatial, and functional single-cell profiling of the hypothalamic "
-                    "preoptic region")
-assay = ASSAYS.MERFISH.value
 attrs = {
-    REQUIRED_ATTRIBUTES.ASSAY: assay,
-    REQUIRED_ATTRIBUTES.SAMPLE_TYPE: sample_type,
-    REQUIRED_ATTRIBUTES.AUTHORS: authors,
-    REQUIRED_ATTRIBUTES.YEAR: year,
-    REQUIRED_ATTRIBUTES.ORGANISM: organism
+    REQUIRED_ATTRIBUTES.ASSAY: ASSAYS.MERFISH,
+    REQUIRED_ATTRIBUTES.SAMPLE_TYPE: "hypothalamic pre-optic nucleus",
+    REQUIRED_ATTRIBUTES.AUTHORS: [
+        "Jeffrey R. Moffitt", "Dhananjay Bambah-Mukku", "Stephen W. Eichhorn", "Eric Vaughn",
+        "Karthik Shekhar", "Julio D. Perez", "Nimrod D. Rubinstein", "Junjie Hao", "Aviv Regev",
+        "Catherine Dulac", "Xiaowei Zhuang"
+    ],
+    REQUIRED_ATTRIBUTES.YEAR: 2018,
+    REQUIRED_ATTRIBUTES.ORGANISM: "mouse",
+    OPTIONAL_ATTRIBUTES.PUBLICATION_NAME: (
+        "Molecular, spatial, and functional single-cell profiling of the hypothalamic preoptic "
+        "region"
+    ),
+    OPTIONAL_ATTRIBUTES.PUBLICATION_URL: "https://science.sciencemag.org/content/362/6416/eaau5324",
 }
 
 ###################################################################################################
@@ -93,13 +91,10 @@ coords = {
     MATRIX_OPTIONAL_REGIONS.ANNOTATION: (MATRIX_AXES.REGIONS.value, annotation)
 }
 dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
-data_array = xr.DataArray(data=chunk_data, coords=coords, dims=dims, name=name, attrs=attrs)
-
-
-###################################################################################################
-# Convert to an xarray dataset and write to a zarr archive on s3.
-
-SpatialDataTypes.MATRIX.write(
-    data_array,
-    url="s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic"
+matrix = starspace.Matrix.from_expression_data(
+    data=chunk_data, coords=coords, dims=dims, name=name, attrs=attrs
 )
+
+s3_url = "s3://starfish.data.output-warehouse/merfish-moffit-2018-science-hypothalamic-preoptic"
+url = "merfish-moffit-2018-science-hypothalamic-preoptic"
+matrix.save_zarr(url=url)

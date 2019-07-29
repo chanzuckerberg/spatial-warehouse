@@ -1,14 +1,15 @@
-from typing import Dict
-
 from enum import Enum
 from itertools import chain
 from pathlib import Path
+from typing import Dict
 
+import anndata
 import dask.array as da
+import loompy
 import numpy as np
 import pandas as pd
-import xarray as xr
 import s3fs
+import xarray as xr
 
 from ._constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
     MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES, \
@@ -164,6 +165,81 @@ class Spots(xr.Dataset):
         spots = cls(dataset)
         spots.attrs = dataset.attrs
         return spots
+
+    def to_records(self) -> np.array:
+        return self.to_dataframe().to_records()
+
+    def to_loom(self, loom_file_name) -> None:
+        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
+        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
+        file_attrs = self.attrs
+        loompy.create(
+            "loom_file_name", self.values, row_attrs, col_attrs, file_attrs=file_attrs
+        )
+
+    def to_anndata(self) -> anndata.AnnData:
+        row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
+        col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
+        file_attrs = self.attrs
+        return anndata.AnnData(X=self.values, obs=row_attrs, var=col_attrs, uns=file_attrs)
+
+    def to_spatial_matrix(self) -> "Matrix":
+        """convert spots to a matrix, provided required optional annotations are present"""
+
+        for field in chain(MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES):
+            if not hasattr(self, field):
+                raise ValueError(
+                    f"dataset must have a '{field}' field to be pivoted to a region x feature matrix"
+                )
+
+        data = self.to_dataframe()
+
+        grouped = data.groupby([MATRIX_REQUIRED_REGIONS.REGION_ID.value, MATRIX_REQUIRED_FEATURES.GENE_NAME])
+        matrix = grouped.count().iloc[:, 0].unstack("gene_name")
+
+        group_columns = [
+            MATRIX_REQUIRED_REGIONS.REGION_ID,
+            MATRIX_REQUIRED_REGIONS.Y_REGION,
+            MATRIX_REQUIRED_REGIONS.X_REGION
+        ]
+        region_ids_map = data.groupby(group_columns).size().reset_index().drop(0, axis=1)
+
+        coords = {
+            MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES.value, matrix.columns),
+            MATRIX_REQUIRED_REGIONS.X_REGION: (
+                MATRIX_AXES.REGIONS.value,
+                region_ids_map.loc[matrix.index, MATRIX_REQUIRED_REGIONS.X_REGION]
+            ),
+            MATRIX_REQUIRED_REGIONS.Y_REGION: (
+                MATRIX_AXES.REGIONS.value,
+                region_ids_map.loc[matrix.index, MATRIX_REQUIRED_REGIONS.Y_REGION]
+            ),
+            MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, matrix.index),
+        }
+        dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
+
+        data_array = Matrix(
+            data=matrix.values, coords=coords, dims=dims, attrs=self.attrs, name="matrix"
+        )
+
+        # fill nan with zero
+        data_array = data_array.fillna(0)
+
+        # drop features or region missing values in required variables.
+        data_array = data_array.where(
+            data_array[MATRIX_REQUIRED_FEATURES.GENE_NAME.value] != "nan", drop=True
+        )
+        data_array = data_array.where(
+            data_array[MATRIX_REQUIRED_REGIONS.REGION_ID.value].notnull(), drop=True
+        )
+        data_array = data_array.where(
+            data_array[MATRIX_REQUIRED_REGIONS.X_REGION.value].notnull(), drop=True
+        )
+        data_array = data_array.where(
+            data_array[MATRIX_REQUIRED_REGIONS.Y_REGION.value].notnull(), drop=True
+        )
+
+        return Matrix(data_array)
 
 
 class Regions(xr.DataArray):

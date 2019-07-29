@@ -4,7 +4,7 @@ import xarray as xr
 import numpy as np
 import pandas as pd
 
-from starspace._constants import *
+from starspace.constants import *
 from starspace.classes import Matrix, Spots, Regions
 
 

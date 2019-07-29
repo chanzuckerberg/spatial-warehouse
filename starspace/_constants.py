@@ -14,9 +14,6 @@ _FIELD_OF_VIEW = "fov"
 
 _GENE_NAME = "gene_name"
 
-MATRIX_CHUNK_SIZE = (5000, 1000)
-MATRIX_NAME = "matrix"
-
 
 ###################################################################################################
 # Attributes
@@ -39,6 +36,7 @@ class ASSAYS(str, Enum):
     MERFISH = "MERFISH"
     ISS = "In-situ Sequencing"
     OSMFISH = "osmFISH"
+
 
 ###################################################################################################
 # Spots
@@ -63,8 +61,14 @@ class SPOTS_OPTIONAL_VARIABLES(str, Enum):
     FIELD_OF_VIEW = _FIELD_OF_VIEW
     ROUND = _ROUND
 
+
 ###################################################################################################
 # Matrix
+
+MATRIX_CHUNK_SIZE = (5000, 1000)
+
+MATRIX_NAME = "matrix"
+
 
 class MATRIX_REQUIRED_REGIONS(str, Enum):
     REGION_ID = _REGION_ID,
@@ -98,6 +102,9 @@ class MATRIX_OPTIONAL_FEATURES(str, Enum):
 
 ###################################################################################################
 # Regions
+
+REGIONS_NAME = "regions"
+
 
 class REGIONS_AXES(str, Enum):
     X_REGION = _X_REGION

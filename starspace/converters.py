@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from starspace import SpatialDataTypes
 from starspace._constants import MATRIX_REQUIRED_FEATURES, MATRIX_AXES, \
     MATRIX_REQUIRED_REGIONS
 from starspace._constants import SPOTS_AXES
@@ -101,8 +100,8 @@ def dataframe2annotated_spots(data: pd.DataFrame, attributes: Dict, validate=Tru
             dataset[MATRIX_REQUIRED_FEATURES.GENE_NAME], dtype="U"
         )
 
-    if validate:
-        SpatialDataTypes.SPOTS.validate(dataset)
+    # if validate:
+    #     SpatialDataTypes.SPOTS.validate(dataset)
 
     return dataset
 

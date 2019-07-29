@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from starspace._constants import *
-from starspace.classes import Matrix, Spots
+from starspace.classes import Matrix, Spots, Regions
 
 
 def make_attributes() -> Dict:
@@ -54,3 +54,14 @@ def make_spots() -> Spots:
     })
     attrs = make_attributes()
     return Spots.from_spot_data(data, attrs)
+
+
+def make_regions() -> Regions:
+
+    data = np.array(
+        [[0, 1, 0],
+         [1, 1, 0],
+         [0, 2, 2]]
+    )
+    attributes = make_attributes()
+    return Regions.from_label_image(data, dims=tuple(REGIONS_AXES), attrs=attributes)

@@ -11,7 +11,8 @@ import xarray as xr
 import s3fs
 
 from ._constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
-    MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES
+    MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES, \
+    REGIONS_NAME
 
 
 # todo figure out how to overwrite existing groups
@@ -53,7 +54,6 @@ def _load_zarr(url: str) -> xr.Dataset:
         dataset = xr.open_zarr(url, chunks=None)  # turn off zarr
 
     return dataset
-
 
 
 class Matrix(xr.DataArray):
@@ -171,7 +171,7 @@ class Regions(xr.DataArray):
     @classmethod
     def from_label_image(cls, label_image, dims, attrs, *args, **kwargs):
 
-        if not isinstance(label_image, da):
+        if not isinstance(label_image, da.core.Array):
             label_image = da.from_array(label_image, chunks=(1000, 1000))
 
         # verify that dimensions are properly formatted
@@ -185,11 +185,11 @@ class Regions(xr.DataArray):
             if v not in attrs:
                 raise ValueError(f"missing required attribute {v}")
 
-        cls(label_image, dims=dims, attrs=attrs)
+        return cls(label_image, dims=dims, attrs=attrs)
 
-    def save_zarr(self, url, profile_name):
+    def save_zarr(self, url, profile_name: str = "spacetx"):
         if self.name is None:
-            dataset = self.to_dataset(name=MATRIX_NAME)
+            dataset = self.to_dataset(name=REGIONS_NAME)
         else:
             dataset = self.to_dataset()
 

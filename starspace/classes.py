@@ -1,7 +1,8 @@
+from collections import OrderedDict
 from enum import Enum
 from itertools import chain
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Sequence, Tuple
 
 import anndata
 import dask.array as da
@@ -13,7 +14,7 @@ import xarray as xr
 
 from .constants import MATRIX_NAME, MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES, \
     MATRIX_AXES, SPOTS_AXES, REQUIRED_ATTRIBUTES, SPOTS_REQUIRED_VARIABLES, REGIONS_AXES, \
-    REGIONS_NAME, SPOTS_NAME
+    REGIONS_NAME, SPOTS_NAME, SCANPY_CONSTANTS
 
 
 # todo figure out how to overwrite existing groups
@@ -58,21 +59,26 @@ def _load_zarr(url: str) -> xr.Dataset:
     return dataset
 
 
+def _correct_coords(coords: dict) -> Dict[str, Tuple[str, Sequence]]:
+    corrected_coords = {}
+    for key, (dim, coord_data) in coords.items():
+        if isinstance(dim, Enum):
+            dim = dim.value
+        if isinstance(key, Enum):
+            key = key.value
+        if np.asarray(coord_data).dtype == object:
+            coord_data = np.array(coord_data, dtype="U")
+        corrected_coords[key] = (dim, coord_data)
+    return corrected_coords
+
+
 class Matrix(xr.DataArray):
 
     @classmethod
     def from_expression_data(cls, data, coords, dims, attrs, *args, **kwargs):
 
         # verify that required coordinates are properly formatted
-        corrected_coords = {}
-        for key, (dim, coord_data) in coords.items():
-            if isinstance(dim, Enum):
-                dim = dim.value
-            if isinstance(key, Enum):
-                key = key.value
-            if np.asarray(data).dtype == object:
-                coord_data = np.array(coord_data, dtype="U")
-            corrected_coords[key] = (dim, coord_data)
+        corrected_coords = _correct_coords(coords)
 
         # verify that coords contains all required values
         for v in chain(MATRIX_REQUIRED_REGIONS, MATRIX_REQUIRED_FEATURES):
@@ -143,11 +149,26 @@ class Matrix(xr.DataArray):
         )
 
     def to_anndata(self) -> anndata.AnnData:
+
+        # scanpy uses obsm to record layout information
+        obsm = OrderedDict()
+        x = self[MATRIX_AXES.REGIONS].coords[MATRIX_REQUIRED_REGIONS.X_REGION].values
+        y = self[MATRIX_AXES.REGIONS].coords[MATRIX_REQUIRED_REGIONS.Y_REGION].values
+
+        layout = np.concatenate([x[:, None], y[:, None]], axis=1)
+        obsm[SCANPY_CONSTANTS.SPATIAL_LAYOUT] = layout
+
         row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
         col_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
         file_attrs = self.attrs
 
-        return anndata.AnnData(X=self.values, obs=row_attrs, var=col_attrs, uns=file_attrs)
+        adata = anndata.AnnData(
+            X=self.values, obs=row_attrs, var=col_attrs, uns=file_attrs, obsm=obsm
+        )
+
+        # set gene names
+        adata.var_names = adata.var[MATRIX_REQUIRED_FEATURES.GENE_NAME]
+        return adata
 
 
 class Spots(xr.Dataset):
@@ -222,6 +243,7 @@ class Spots(xr.Dataset):
             ),
             MATRIX_REQUIRED_REGIONS.REGION_ID: (MATRIX_AXES.REGIONS.value, matrix.index),
         }
+        coords = _correct_coords(coords)
         dims = (MATRIX_AXES.REGIONS.value, MATRIX_AXES.FEATURES.value)
 
         data_array = xr.DataArray(

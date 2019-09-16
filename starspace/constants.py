@@ -37,6 +37,7 @@ class ASSAYS(str, Enum):
     ISS = "In-situ Sequencing"
     OSMFISH = "osmFISH"
     CODEX = "CODEX"
+    SEQFISH = "SEQFISH"
 
 
 ###################################################################################################

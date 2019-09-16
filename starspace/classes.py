@@ -72,6 +72,15 @@ def _correct_coords(coords: dict) -> Dict[str, Tuple[str, Sequence]]:
     return corrected_coords
 
 
+def _correct_col_dtypes(data: pd.DataFrame) -> pd.DataFrame:
+    """converts any object dtype columns to fixed-width unicode strings"""
+    for col in data:
+        column_data = data[col]
+        if column_data.dtype == object:
+            data[col] = np.array(column_data, dtype="U")
+    return data
+
+
 class Matrix(xr.DataArray):
 
     @classmethod
@@ -179,6 +188,9 @@ class Spots(xr.Dataset):
         # verify colnames are strings, not enums
         columns = [c.value if isinstance(c, Enum) else c for c in dataframe.columns]
         dataframe.columns = columns
+
+        # convert any object columns to string columns
+        dataframe = _correct_col_dtypes(dataframe)
 
         # name the index, which will form the dimensions of the dataset
         dataframe.index.name = SPOTS_AXES.SPOTS.value

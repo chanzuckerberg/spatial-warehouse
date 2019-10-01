@@ -72,6 +72,6 @@ coords = {
 }
 
 matrix = starspace.Matrix.from_expression_data(data.values, coords, dims, attributes)
-s3_url = ("s3://starfish.data.output-warehouse/codex_goltsev_2018_cell_spleen/")
+# s3_url = ("s3://starfish.data.output-warehouse/codex_goltsev_2018_cell_spleen/")
 url = ("codex_goltsev_2018_cell_spleen/")
 matrix.save_zarr(url=url)

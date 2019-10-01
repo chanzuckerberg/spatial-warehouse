@@ -6,7 +6,7 @@ Jeffrey R. Moffitt, Junjie Hao, Guiping Wang, Kok Hao Chen, Hazen P. Babcock, Xi
 
 This publication can be found at https://www.pnas.org/content/113/39/11046 and the
 data referenced below can be downloaded from
-s3://starfish.data.published/MERFISH/20181005/starfish_results/benchmark_results.csv
+s3://starfish.data.published/MERFISH/20181005/starfish_results/published_MERFISH_decoded_results.csv
 
 Checklist:
 - [x] point locations

@@ -37,6 +37,7 @@ class ASSAYS(str, Enum):
     ISS = "In-situ Sequencing"
     OSMFISH = "osmFISH"
     CODEX = "CODEX"
+    SEQFISH = "SEQFISH"
 
 
 ###################################################################################################
@@ -103,6 +104,8 @@ class MATRIX_OPTIONAL_FEATURES(str, Enum):
     ROUND = _ROUND
     CHANNEL = _CHANNEL
 
+class SCANPY_CONSTANTS:
+    SPATIAL_LAYOUT = "X_spatial"
 
 ###################################################################################################
 # Regions

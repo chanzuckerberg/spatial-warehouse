@@ -83,6 +83,8 @@ def _correct_col_dtypes(data: pd.DataFrame) -> pd.DataFrame:
 
 class Matrix(xr.DataArray):
 
+    __slots__ = []
+
     @classmethod
     def from_expression_data(cls, data, coords, dims, attrs, *args, **kwargs):
 
@@ -181,6 +183,8 @@ class Matrix(xr.DataArray):
 
 
 class Spots(xr.Dataset):
+
+    __slots__ = []
 
     @classmethod
     def from_spot_data(cls, dataframe: pd.DataFrame, attrs: Dict):
@@ -283,6 +287,8 @@ class Spots(xr.Dataset):
 
 
 class Regions(xr.DataArray):
+
+    __slots__ = []
 
     @classmethod
     def from_label_image(cls, label_image, dims, attrs, *args, **kwargs):

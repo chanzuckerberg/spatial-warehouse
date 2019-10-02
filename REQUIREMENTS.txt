@@ -5,9 +5,10 @@ numpy
 h5py
 pandas
 loompy
+numpy_groupies
 h5py
 anndata
-napari==0.1.3
+napari
 jupyterlab
 ipykernel
 xlrd
@@ -15,3 +16,4 @@ xarray
 zarr
 dask[array, dataframe]
 s3fs
+PyQt5>=5.12.3

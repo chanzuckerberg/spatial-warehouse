@@ -24,7 +24,6 @@ from itertools import repeat
 from pathlib import Path
 
 import dask.array as da
-import xarray as xr
 import h5py
 import pandas as pd
 import numpy as np

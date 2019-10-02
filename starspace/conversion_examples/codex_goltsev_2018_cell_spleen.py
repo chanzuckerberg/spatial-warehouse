@@ -52,7 +52,7 @@ data = data.drop(
 
 additional_metadata = defaultdict(list)
 for i, v in enumerate(metadata_col):
-    sample_type, fov_x, fov_y = v.split('_')
+    sample_type, fov_x, fov_y = v.split('_')  # TODO this seems like it might be wrong from inspection in cellxgene
     additional_metadata["sample_type"].append(sample_type)
     additional_metadata["fov_x"].append(int(fov_x.strip("X")))
     additional_metadata["fov_y"].append(int(fov_y.strip("Y")))

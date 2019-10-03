@@ -38,6 +38,7 @@ class ASSAYS(str, Enum):
     OSMFISH = "osmFISH"
     CODEX = "CODEX"
     SEQFISH = "SEQFISH"
+    SPATIAL_TRANSCRIPTOMICS = "Spatial Transcriptomics"
 
 
 ###################################################################################################

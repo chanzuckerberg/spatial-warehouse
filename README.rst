@@ -2,8 +2,8 @@ Starspace
 =========
 
 .. image:: https://readthedocs.org/projects/starspace/badge/?version=latest
-:target: https://starspace.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+  :target: https://starspace.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
 Starspace defines a basic, minimal, proof of concept schema for gene or protein expression data
 containing spatially localized information. This project accomplishes the following:

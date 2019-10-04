@@ -1,4 +1,5 @@
-# spatial-warehouse
+Starspace
+=========
 
 .. image:: https://readthedocs.org/projects/starspace/badge/?version=latest
 :target: https://starspace.readthedocs.io/en/latest/?badge=latest

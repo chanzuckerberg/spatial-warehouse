@@ -10,6 +10,6 @@ python, visualized, and analyzed.
 2. osmFISH.ipynb_
 3. spatial_transcriptomics.ipynb_
 
-.. _codex.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/visualization_examples/codex.ipynb
-.. _osmFISH.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/visualization_examples/osmFISH.ipynb
-.. _spatial_transcriptomics.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/visualization_examples/spatial_transcriptomics.ipynb
+.. _codex.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/analysis_examples/codex.ipynb
+.. _osmFISH.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/analysis_examples/osmFISH.ipynb
+.. _spatial_transcriptomics.ipynb: https://github.com/chanzuckerberg/spatial-warehouse/blob/master/analysis_examples/spatial_transcriptomics.ipynb

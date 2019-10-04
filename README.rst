@@ -21,7 +21,7 @@ containing spatially localized information. Specifically, it:
    convert the formats into `loom`_ and `anndata`_ objects, for downstream analysis in R and
    Python.
   
-See the documentation_ for more info. 
+See the documentation_ for more information.
 
 .. _documentation: http://starspace.rtfd.io/
 

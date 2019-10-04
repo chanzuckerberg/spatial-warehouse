@@ -1,0 +1,14 @@
+[
+  {
+    "description": "name of first spots axis, which contains an integer index",
+    "mode": "OPTIONAL",
+    "name": "spot_index",
+    "type": "STRING"
+  },
+  {
+    "description": "name of second spots axis, listing spot characteristics",
+    "mode": "OPTIONAL",
+    "name": "spot_characteristics",
+    "type": "STRING"
+  }
+]

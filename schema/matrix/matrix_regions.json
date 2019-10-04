@@ -1,0 +1,62 @@
+[
+  {
+    "description": "unique identifier for the region",
+    "mode": "REQUIRED",
+    "name": "region_id",
+    "type": "INT"
+  },
+  {
+    "description": "x-coordinate of the center of the region",
+    "mode": "REQUIRED",
+    "name": "x_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "y-coordinate of the center of the region",
+    "mode": "REQUIRED",
+    "name": "y_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the center of the region",
+    "mode": "OPTIONAL",
+    "name": "z_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "physical annotation for the region, e.g. 'brain white matter'",
+    "mode": "OPTIONAL",
+    "name": "physical_annotation",
+    "type": "STRING"
+  },
+  {
+    "description": "cell type annotation for the region",
+    "mode": "OPTIONAL",
+    "name": "type_annotation",
+    "type": "STRING"
+  },
+  {
+    "description": "group id for this cell, e.g. cluster id",
+    "mode": "OPTIONAL",
+    "name": "group_id",
+    "type": "INT"
+  },
+  {
+    "description": "field of view that this region was identified in",
+    "mode": "OPTIONAL",
+    "name": "fov",
+    "type": "INT"
+  },
+  {
+    "description": "area of the region in pixels",
+    "mode": "OPTIONAL",
+    "name": "area_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "area of the region in square micrometers",
+    "mode": "OPTIONAL",
+    "name": "area_um2",
+    "type": "FLOAT"
+  }
+]

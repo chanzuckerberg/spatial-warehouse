@@ -43,7 +43,7 @@ y = data["Y.Y"]
 z = data["Z.Z"]
 group = data["niche cluster ID"]
 metadata_col = data["sample_Xtile_Ytile"]
-biol_annotation = data["Imaging phenotype cluster ID"]
+type_annotation = data["Imaging phenotype cluster ID"]
 
 data = data.drop(
     ["X.X", "Y.Y", "Z.Z", "sample_Xtile_Ytile", "niche cluster ID", "Imaging phenotype cluster ID"],
@@ -65,7 +65,7 @@ coords = {
     MATRIX_REQUIRED_REGIONS.Y_REGION: (MATRIX_AXES.REGIONS, y),
     MATRIX_OPTIONAL_REGIONS.Z_REGION: (MATRIX_AXES.REGIONS, z),
     MATRIX_OPTIONAL_REGIONS.GROUP_ID: (MATRIX_AXES.REGIONS, group),
-    MATRIX_OPTIONAL_REGIONS.BIOL_ANNOTATION: (MATRIX_AXES.REGIONS, biol_annotation),
+    MATRIX_OPTIONAL_REGIONS.TYPE_ANNOTATION: (MATRIX_AXES.REGIONS, type_annotation),
     "fov_x": (MATRIX_AXES.REGIONS, additional_metadata["fov_x"]),
     "fov_y": (MATRIX_AXES.REGIONS, additional_metadata["fov_y"]),
     "sample_type": (MATRIX_AXES.REGIONS, additional_metadata["sample_type"])

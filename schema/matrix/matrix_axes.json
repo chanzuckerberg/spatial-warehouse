@@ -1,0 +1,14 @@
+[
+  {
+    "description": "name of first matrix axis, describing regions",
+    "mode": "OPTIONAL",
+    "name": "regions",
+    "type": "STRING"
+  },
+  {
+    "description": "name of second matrix axis, describing features",
+    "mode": "OPTIONAL",
+    "name": "features",
+    "type": "STRING"
+  }
+]

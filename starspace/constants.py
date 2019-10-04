@@ -85,7 +85,7 @@ class MATRIX_REQUIRED_REGIONS(str, Enum):
 class MATRIX_OPTIONAL_REGIONS(str, Enum):
     Z_REGION = _Z_REGION,
     PHYS_ANNOTATION = "physical_annotation"
-    BIOL_ANNOTATION = "biological_annotation"
+    TYPE_ANNOTATION = "type_annotation"
     GROUP_ID = "group_id"
     FIELD_OF_VIEW = _FIELD_OF_VIEW
     AREA_PIXELS = "area_pixels"

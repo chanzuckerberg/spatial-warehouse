@@ -16,4 +16,4 @@ Contents
   - transcript locations (if appropriate)
   - cell locations in polygons or masks
 - Instructions to load and convert data into required format, including any information acquired via
-direct communications with authors.
+  direct communications with authors.

@@ -1,0 +1,68 @@
+[
+  {
+    "description": "Name of the gene, using standard symbols",
+    "mode": "REQUIRED",
+    "name": "gene_name",
+    "type": "STRING"
+  },
+  {
+    "description": "y-coordinate of the center of the spot",
+    "mode": "REQUIRED",
+    "name": "y_spot",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the center of the spot",
+    "mode": "REQUIRED",
+    "name": "x_spot",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the center of the spot",
+    "mode": "OPTIONAL",
+    "name": "z_spot",
+    "type": "FLOAT"
+  },
+  {
+    "description": "id of the region (e.g. cell) that this spot belongs to",
+    "mode": "OPTIONAL",
+    "name": "region_id",
+    "type": "INT"
+  },
+  {
+    "description": "z-coordinate of the region this spot falls inside",
+    "mode": "OPTIONAL",
+    "name": "z_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "y-coordinate of the region this spot falls inside",
+    "mode": "OPTIONAL",
+    "name": "y_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the region this spot falls inside",
+    "mode": "OPTIONAL",
+    "name": "x_region",
+    "type": "FLOAT"
+  },
+  {
+    "description": "quality of this spot",
+    "mode": "OPTIONAL",
+    "name": "quality",
+    "type": "FLOAT"
+  },
+  {
+    "description": "radius of the spot",
+    "mode": "OPTIONAL",
+    "name": "radius",
+    "type": "FLOAT"
+  },
+  {
+    "description": "field of view that this spot is associated with",
+    "mode": "OPTIONAL",
+    "name": "fov",
+    "type": "INT"
+  }
+]

@@ -1,3 +1,10 @@
 pytest
 sphinx
 matplotlib
+numpydoc
+sphinx_autodoc_typehints
+sphinx_bootstrap_theme
+sphinxcontrib-programoutput
+sphinx-gallery
+sphinx_rtd_theme
+m2r

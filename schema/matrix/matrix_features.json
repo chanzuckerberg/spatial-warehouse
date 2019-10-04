@@ -1,0 +1,8 @@
+[
+  {
+    "description": "name of the feature (e.g. gene or protein name)",
+    "mode": "REQUIRED",
+    "name": "gene_name",
+    "type": "STRING"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "description": "name of regions y-axis",
+    "mode": "OPTIONAL",
+    "name": "y_region",
+    "type": "STRING"
+  },
+  {
+    "description": "name of regions x-axis",
+    "mode": "OPTIONAL",
+    "name": "x_region",
+    "type": "STRING"
+  }
+]

@@ -18,6 +18,8 @@ Load the data
 """
 
 import os
+import requests
+from io import BytesIO
 
 import dask.array as da
 import numpy as np
@@ -26,11 +28,12 @@ import pandas as pd
 import starspace
 from starspace.constants import *
 
-directory = (
-    "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
-    "2018_moffit_science_hypothalamic-pre-optic"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/2018_moffit_science_hypothalamic-pre-optic/"
+    "Moffitt_and_Bambah-Mukku_et_al_merfish_all_cells.csv"
 )
-data = pd.read_csv(os.path.join(directory, "Moffitt_and_Bambah-Mukku_et_al_merfish_all_cells.csv"))
+data = pd.read_csv(BytesIO(response.content))
+
 name = "merfish moffit 2018 science hypothalamic preoptic"
 
 ###################################################################################################

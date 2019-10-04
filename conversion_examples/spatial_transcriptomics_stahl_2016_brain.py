@@ -20,24 +20,22 @@ load the data
 -------------
 """
 
-import os
-from pathlib import Path
+from io import BytesIO
 
+import dask.array as da
 import numpy as np
 import pandas as pd
-import dask.array as da
+import requests
 from skimage.transform import matrix_transform
 
 import starspace
 from starspace.constants import *
 
-dirpath = Path(os.path.expanduser(
-    "~/google_drive/czi/spatial-approaches/spatial-transcriptomics/10.1126/science.aaf2403"
-))
-
-spots_file = dirpath / "Rep1_MOB_count_matrix-1.tsv"
-transformations_file = dirpath / "Rep1_MOB_transformation.txt"
-image_file = dirpath / "HE_Rep1.jpg"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/spatial_transcriptomics_stahl_2016/"
+    "Rep1_MOB_count_matrix-1.tsv"
+)
+data = pd.read_csv(BytesIO(response.content), sep='\t', index_col=0)
 
 attributes = {
     REQUIRED_ATTRIBUTES.AUTHORS: (
@@ -59,11 +57,13 @@ attributes = {
 }
 # convert the spots data
 # cells maybe need a radius?
-data = pd.read_csv(spots_file, sep='\t', index_col=0)
 
 # transform coordinates
-with open(transformations_file, 'r') as f:
-    transform = np.array([float(v) for v in f.read().strip().split()]).reshape(3, 3).T
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/spatial_transcriptomics_stahl_2016/"
+    "Rep1_MOB_transformation.txt"
+)
+transform = np.array([float(v) for v in response.content.decode().strip().split()]).reshape(3, 3).T
 
 x, y = zip(*[map(float, v.split('x')) for v in data.index])
 

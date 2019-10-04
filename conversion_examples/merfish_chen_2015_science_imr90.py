@@ -15,19 +15,20 @@ Checklist:
 Load the data
 -------------
 """
-
-import os
+import requests
+from io import BytesIO
 
 import pandas as pd
 
 import starspace
 from starspace.constants import *
 
-directory = (
-    "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/MERFISH/"
-    "2015_chen_science_merfish"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/merfish_chen_2015_science_imr90/"
+    "140genesData.xlsx"
 )
-data = pd.read_excel(os.path.join(directory, "140genesData.xlsx"))
+data = pd.read_excel(BytesIO(response.content))
+
 name = "merfish chen 2015 science imr90"
 
 ###################################################################################################

@@ -8,19 +8,20 @@ Sarah Black, Garry P. Nolan
 The data can be downloaded here: http://welikesharingdata.blob.core.windows.net/forshare/index.html
 and the paper is available here: https://doi.org/10.1016/j.cell.2018.07.010
 """
-from pathlib import Path
 from collections import defaultdict
+from io import BytesIO
 
 import pandas as pd
-import numpy as np
+import requests
 
 import starspace
 from starspace.constants import *
 
-path_dir = Path("~/google_drive/czi/spatial-approaches/proteomics/codex")
-expression_file = path_dir / "Suppl.Table2.CODEX_paper_MRLdatasetexpression.csv"
-
-data = pd.read_csv(expression_file)
+response = requests.get(
+   "https://d24h2xsgaj29mf.cloudfront.net/raw/codex_goltsev_2018_cell_spleen/" 
+   "Suppl.Table2.CODEX_paper_MRLdatasetexpression.csv"
+)
+data = pd.read_csv(BytesIO(response.content))
 
 attributes = {
     REQUIRED_ATTRIBUTES.ASSAY: ASSAYS.CODEX,
@@ -72,6 +73,5 @@ coords = {
 }
 
 matrix = starspace.Matrix.from_expression_data(data.values, coords, dims, attributes)
-# s3_url = ("s3://starfish.data.output-warehouse/codex_goltsev_2018_cell_spleen/")
 url = ("codex_goltsev_2018_cell_spleen/")
 matrix.save_zarr(url=url)

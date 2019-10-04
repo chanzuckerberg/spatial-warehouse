@@ -17,31 +17,37 @@ load the data
 -------------
 """
 
-import os
 import pickle
 import re
+import requests
 from itertools import repeat
-from pathlib import Path
+from io import BytesIO
+import tempfile
 
 import dask.array as da
 import h5py
-import pandas as pd
-import numpy as np
 import loompy
+import numpy as np
+import pandas as pd
 
 import starspace
 from starspace.constants import *
 
-dirpath = Path(os.path.expanduser(
-    "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/osmFISH"
-))
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/"
+    "osmfish_codeluppi_2018_nat-methods_somatosensory-cortex/"
+    "mRNA_coords_raw_counting.hdf5"
+)
+spots_data = h5py.File(BytesIO(response.content), "r")
 
-spots_file = dirpath / "mRNA_coords_raw_counting.hdf5"
-cells_file = dirpath / "osmFISH_SScortex_mouse_all_cells.loom"
-regions_file = dirpath / "polyT_seg.pkl"
-incl_cells_file = dirpath / "Included_cells.p"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/"
+    "osmfish_codeluppi_2018_nat-methods_somatosensory-cortex/"
+    "polyT_seg.pkl"
+)
+region_data = pickle.load(BytesIO(response.content))
 
-spots_data = h5py.File(spots_file, "r")
+
 
 # load spot info
 gene = []
@@ -93,10 +99,6 @@ spots.save_zarr(url=url)
 ###################################################################################################
 # load the region information; we're gonna be lazy and just create a label image. Makes for simple
 # lookups. It's only 6 gb, and we can put it in dask, so w/e
-
-with open(regions_file, "rb") as f:
-    region_data = pickle.load(f)
-
 # find the extent of the images from the spots and the region data
 
 x_min, x_max = np.percentile(spot_data[SPOTS_REQUIRED_VARIABLES.X_SPOT], [0, 100])
@@ -118,10 +120,20 @@ regions.save_zarr(url=url)
 ###################################################################################################
 # load up the count matrix
 
-conn = loompy.connect(cells_file, mode="r")
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/"
+    "osmfish_codeluppi_2018_nat-methods_somatosensory-cortex/"
+    "osmFISH_SScortex_mouse_all_cells.loom"
+)
+with tempfile.TemporaryDirectory() as tmpdirname:
+    with open(os.path.join(tmpdirname, "temp.loom"), 'wb') as f:
+        f.write(response.content)
+    conn = loompy.connect("temp.loom", mode="r")
 
-row_attrs = dict(conn.row_attrs)
-col_attrs = dict(conn.col_attrs)
+    row_attrs = dict(conn.row_attrs)
+    col_attrs = dict(conn.col_attrs)
+
+    data = da.from_array(conn[:, :].T, chunks=MATRIX_CHUNK_SIZE)
 
 # region id should be int dtype
 col_attrs["CellID"] = col_attrs["CellID"].astype(int)
@@ -144,8 +156,6 @@ coords = {
     MATRIX_REQUIRED_FEATURES.GENE_NAME: (MATRIX_AXES.FEATURES, row_attrs["Gene"]),
     MATRIX_OPTIONAL_FEATURES.ROUND.value: (MATRIX_AXES.FEATURES, row_attrs["Hybridization"]),
 }
-
-data = da.from_array(conn[:, :].T, chunks=MATRIX_CHUNK_SIZE)
 
 matrix = starspace.Matrix.from_expression_data(
     data=data, coords=coords, dims=dims, name="matrix", attrs=attributes

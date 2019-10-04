@@ -16,20 +16,19 @@ Checklist:
 Load the data
 -------------
 """
-from pathlib import Path
+import requests
+from io import BytesIO
 
 import pandas as pd
 
 import starspace
 from starspace.constants import *
 
-dirpath = Path(
-    "~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/ISS/2013_mignardi_breast"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/iss_ke_2013_nat-methods_breast-cancer/all_spots.csv"
 )
 
-counts = dirpath / "all_spots.csv"
-
-data = pd.read_csv(counts)
+data = pd.read_csv(BytesIO(response.content))
 
 column_map = {
     "gene": SPOTS_REQUIRED_VARIABLES.GENE_NAME.value,
@@ -63,5 +62,5 @@ data.columns = standard_columns
 spots = starspace.Spots.from_spot_data(data, attributes)
 
 # s3_url = "s3://starfish.data.output-warehouse/iss_ke_2013_nat-methods_breast-cancer"
-local_url = "iss_ke_2013_nat-methods_breast-cancer"
+local_url = "iss_ke_2013_nat-methods_breast-cancer/"
 spots.save_zarr(local_url)

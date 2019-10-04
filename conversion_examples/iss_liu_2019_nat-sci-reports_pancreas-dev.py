@@ -13,26 +13,36 @@ Checklist:
 - [x] cell x gene expression matrix (derivable)
 
 """
+import requests
 from pathlib import Path
+from io import BytesIO
 
 import pandas as pd
 
 import starspace
 from starspace.constants import *
 
-dirpath = Path("~/google_drive/czi/spatial-approaches/in-situ-transcriptomics/ISS/"
-               "2019_liu_natscireports_pancreas"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/iss_liu_2019_nat-sci-reports_pancreas-dev/"
+    "Nuc_TOT_2p2.txt"
 )
+region_data = pd.read_csv(BytesIO(response.content))
 
-nuclei_file = dirpath / "Nuc_TOT_2p2.txt"
-rna_file = dirpath / "RNA_TOT_2p2.txt"
-gene_map_file = dirpath / "Conversion_Pool2.txt"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/iss_liu_2019_nat-sci-reports_pancreas-dev/"
+    "RNA_TOT_2p2.txt"
+)
+rna_data = pd.read_csv(BytesIO(response.content))
+
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/iss_liu_2019_nat-sci-reports_pancreas-dev/"
+    "Conversion_Pool2.txt"
+)
+gene_map = pd.read_csv(BytesIO(response.content))
 
 ##################################################################################################
 # Build the spot table
 
-rna_data = pd.read_csv(rna_file)
-gene_map = pd.read_csv(gene_map_file)
 
 # some of these spots don't map to real genes. Interesting. Definitely retain "Barcode_Num" and
 # "Barcode_Letter"
@@ -46,7 +56,6 @@ rna_data = pd.concat([rna_data, gene_info], axis=1)
 rna_data = rna_data.drop("ObjectNumber", axis=1)
 
 # merge in cell centroids
-region_data = pd.read_csv(nuclei_file)
 region_data = region_data.set_index("ObjectNumber")
 region_data = region_data.drop("ImageNumber", axis=1)  # duplicated in rna_data
 region_info = region_data.loc[rna_data["Parent_Cells"], :]
@@ -92,7 +101,7 @@ attributes = {
 spots = starspace.Spots.from_spot_data(rna_data, attributes)
 
 
-s3_url = "s3://starfish.data.output-warehouse/iss_liu_2019_nat-sci-reports_pancreas-dev/"
+# s3_url = "s3://starfish.data.output-warehouse/iss_liu_2019_nat-sci-reports_pancreas-dev/"
 url = "iss_liu_2019_nat-sci-reports_pancreas-dev/"
 spots.save_zarr(url=url)
 

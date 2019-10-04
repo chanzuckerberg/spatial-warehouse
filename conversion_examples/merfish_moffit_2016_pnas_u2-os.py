@@ -21,17 +21,21 @@ Load the data
 -------------
 """
 
-from pathlib import Path
+from io import BytesIO
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+import requests
 
 import starspace
 from starspace.constants import *
 
-data_path = Path("~/Downloads/") / "published_MERFISH_decoded_results.csv"
+response = requests.get(
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/merfish_moffit_2016_pnas_u2-os/"
+    "published_MERFISH_decoded_results.csv"
+)
 
-data = pd.read_csv(data_path, index_col=0)
+data = pd.read_csv(BytesIO(response.content), index_col=0)
 
 # convert distance to quality; we'll map the name to quality below
 data['distance'] = 1 - data['distance']

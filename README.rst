@@ -25,4 +25,6 @@ See the documentation_ for more info.
 
 .. _documentation: http://starspace.rtfd.io/
 
-
+.. _zarr: https://zarr.readthedocs.io/en/stable/
+.. _loom: https://linnarssonlab.org/loompy/
+.. _anndata: https://anndata.readthedocs.io/en/stable/

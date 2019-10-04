@@ -5,8 +5,11 @@ Starspace
   :target: https://starspace.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
+.. image:: https://travis-ci.com/chanzuckerberg/spatial-warehouse.svg?branch=master
+  :target: https://travis-ci.com/chanzuckerberg/spatial-warehouse
+
 Starspace defines a basic, minimal, proof of concept schema for gene or protein expression data
-containing spatially localized information. This project accomplishes the following:
+containing spatially localized information. Specifically, it:
 
 1. Defines a standard schema to describe spots, spatial matrices, and cell regions
 2. Implements a library that reads and writes files in the defined schema, leveraging the `zarr`_

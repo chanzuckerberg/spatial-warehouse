@@ -1,19 +1,20 @@
+import json
+import os
+
 from enum import Enum
+from pathlib import Path
+
+###################################################################################################
+# Load schema
+
+directory = Path(os.path.dirname(os.path.abspath(__file__))).parent
+
 
 ###################################################################################################
 # General
 
-_X_REGION = "x_region"
-_Y_REGION = "y_region"
-_Z_REGION = "z_region"
-_REGION_ID = "region_id"
 _ROUND = "round"
 _CHANNEL = "channel"
-
-_FIELD_OF_VIEW = "fov"
-
-_GENE_NAME = "gene_name"
-
 
 ###################################################################################################
 # Attributes
@@ -44,32 +45,47 @@ class ASSAYS(str, Enum):
 ###################################################################################################
 # Spots
 
+with open(directory / "schema/spots/spots_axes.json", "rb") as f:
+    _spots_axes = json.load(f)
+
+with open(directory / "schema/spots/spots_columns.json", "rb") as f:
+    _spots_columns = json.load(f)
+
 SPOTS_NAME = "spots"
 
-
 class SPOTS_AXES(str, Enum):
-    SPOTS = "spots"
+    SPOTS = _spots_axes[1]["name"]
+
 
 class SPOTS_REQUIRED_VARIABLES(str, Enum):
-    GENE_NAME = _GENE_NAME
-    X_SPOT = "x_spot"
-    Y_SPOT = "y_spot"
+    GENE_NAME = _spots_columns[0]["name"]
+    Y_SPOT = _spots_columns[1]["name"]
+    X_SPOT = _spots_columns[2]["name"]
 
 
 class SPOTS_OPTIONAL_VARIABLES(str, Enum):
-    REGION_ID = _REGION_ID
-    X_REGION = _X_REGION
-    Y_REGION = _Y_REGION
-    Z_REGION = _Z_REGION
-    Z_SPOT = "z_spot"
-    QUALITY = "spot_quality"
-    RADIUS = "spot_radius"
-    FIELD_OF_VIEW = _FIELD_OF_VIEW
+    Z_SPOT = _spots_columns[3]["name"]
+    REGION_ID = _spots_columns[4]["name"]
+    Z_REGION = _spots_columns[5]["name"]
+    Y_REGION = _spots_columns[6]["name"]
+    X_REGION = _spots_columns[7]["name"]
+    QUALITY = _spots_columns[8]["name"]
+    RADIUS = _spots_columns[9]["name"]
+    FIELD_OF_VIEW = _spots_columns[10]["name"]
     ROUND = _ROUND
 
 
 ###################################################################################################
 # Matrix
+
+with open(directory / "schema/matrix/matrix_axes.json", "rb") as f:
+    _matrix_axes = json.load(f)
+
+with open(directory / "schema/matrix/matrix_features.json", "rb") as f:
+    _matrix_features = json.load(f)
+
+with open(directory / "schema/matrix/matrix_regions.json", "rb") as f:
+    _matrix_regions = json.load(f)
 
 MATRIX_CHUNK_SIZE = (5000, 1000)
 
@@ -77,28 +93,28 @@ MATRIX_NAME = "matrix"
 
 
 class MATRIX_REQUIRED_REGIONS(str, Enum):
-    REGION_ID = _REGION_ID,
-    X_REGION = _X_REGION,
-    Y_REGION = _Y_REGION,
+    REGION_ID = _matrix_regions[0]["name"]
+    X_REGION = _matrix_regions[1]["name"]
+    Y_REGION = _matrix_regions[2]["name"]
 
 
 class MATRIX_OPTIONAL_REGIONS(str, Enum):
-    Z_REGION = _Z_REGION,
-    PHYS_ANNOTATION = "physical_annotation"
-    TYPE_ANNOTATION = "type_annotation"
-    GROUP_ID = "group_id"
-    FIELD_OF_VIEW = _FIELD_OF_VIEW
-    AREA_PIXELS = "area_pixels"
-    AREA_UM2 = "area_um2"
+    Z_REGION = _matrix_regions[3]["name"]
+    PHYS_ANNOTATION = _matrix_regions[4]["name"]
+    TYPE_ANNOTATION = _matrix_regions[5]["name"]
+    GROUP_ID = _matrix_regions[6]["name"]
+    FIELD_OF_VIEW = _matrix_regions[7]["name"]
+    AREA_PIXELS = _matrix_regions[8]["name"]
+    AREA_UM2 = _matrix_regions[9]["name"]
 
 
 class MATRIX_AXES(str, Enum):
-    REGIONS = "regions"
-    FEATURES = "features"
+    REGIONS = _matrix_axes[0]["name"]
+    FEATURES = _matrix_axes[1]["name"]
 
 
 class MATRIX_REQUIRED_FEATURES(str, Enum):
-    GENE_NAME = _GENE_NAME
+    GENE_NAME = _matrix_features[0]["name"]
 
 
 class MATRIX_OPTIONAL_FEATURES(str, Enum):
@@ -111,9 +127,12 @@ class SCANPY_CONSTANTS:
 ###################################################################################################
 # Regions
 
+with open(directory / "schema/regions/regions_axes.json", "rb") as f:
+    _regions_axes = json.load(f)
+
 REGIONS_NAME = "regions"
 
 
 class REGIONS_AXES(str, Enum):
-    X_REGION = _X_REGION
-    Y_REGION = _Y_REGION
+    Y_REGION = _regions_axes[0]["name"]
+    X_REGION = _regions_axes[1]["name"]

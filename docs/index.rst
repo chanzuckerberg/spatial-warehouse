@@ -30,10 +30,10 @@ Contents
 ========
 
 .. toctree::
-   :maxdepth: 0
 
    schema
    library
    conversion_examples/index
    analysis_examples
+   contributing
 

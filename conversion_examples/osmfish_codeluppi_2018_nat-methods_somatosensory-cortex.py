@@ -128,7 +128,7 @@ response = requests.get(
 with tempfile.TemporaryDirectory() as tmpdirname:
     with open(os.path.join(tmpdirname, "temp.loom"), 'wb') as f:
         f.write(response.content)
-    conn = loompy.connect("temp.loom", mode="r")
+    conn = loompy.connect(os.path.join(tmpdirname, "temp.loom"), mode="r")
 
     row_attrs = dict(conn.row_attrs)
     col_attrs = dict(conn.col_attrs)

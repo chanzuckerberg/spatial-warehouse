@@ -31,15 +31,9 @@ Contents
 
 .. toctree::
    :maxdepth: 0
-   :caption: Contents:
 
    schema
+   library
    conversion_examples/index
    analysis_examples
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

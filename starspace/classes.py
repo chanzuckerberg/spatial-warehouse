@@ -181,6 +181,15 @@ class Matrix(xr.DataArray):
         adata.var_names = adata.var[MATRIX_REQUIRED_FEATURES.GENE_NAME]
         return adata
 
+    def column_metadata(self) -> pd.DataFrame:
+        return pd.DataFrame(
+           {k: v.values for (k, v) in self[MATRIX_AXES.FEATURES].coords.items()}
+        )
+
+    def row_metadata(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            row_attrs = {k: v.values for (k, v) in self[MATRIX_AXES.REGIONS].coords.items()}
+        )
 
 class Spots(xr.Dataset):
 

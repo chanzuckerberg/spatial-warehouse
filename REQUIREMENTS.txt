@@ -4,6 +4,7 @@ scikit-image
 numpy
 h5py
 pandas
+requests
 loompy
 numpy_groupies
 h5py

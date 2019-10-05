@@ -1,4 +1,5 @@
 pytest
+pygments
 sphinx
 matplotlib
 numpydoc

@@ -29,17 +29,16 @@ import starspace
 from starspace.constants import *
 
 response = requests.get(
-    "https://d24h2xsgaj29mf.cloudfront.net/raw/2018_moffit_science_hypothalamic-pre-optic/"
+    "https://d24h2xsgaj29mf.cloudfront.net/raw/merfish_moffit_2018_science_hypothalamic-preoptic/"
     "Moffitt_and_Bambah-Mukku_et_al_merfish_all_cells.csv"
 )
-data = pd.read_csv(BytesIO(response.content))
+data = pd.read_csv(BytesIO(response.content), header=0)
 
 name = "merfish moffit 2018 science hypothalamic preoptic"
 
 ###################################################################################################
 # This data file is a cell x gene expression matrix that contains additional metadata as columns
 # of the matrix. Extract those extra columns and clean up the data file.
-
 annotation = np.array(data["Cell_class"], dtype="U")
 group_id = np.array(data["Neuron_cluster_ID"], dtype="U")
 x = data["Centroid_X"]

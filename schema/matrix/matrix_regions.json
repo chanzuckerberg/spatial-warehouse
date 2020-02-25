@@ -6,21 +6,21 @@
     "type": "INT"
   },
   {
-    "description": "x-coordinate of the center of the region",
+    "description": "x-coordinate of the center of the region, in microns",
     "mode": "REQUIRED",
-    "name": "x_region",
+    "name": "x_region_microns",
     "type": "FLOAT"
   },
   {
-    "description": "y-coordinate of the center of the region",
+    "description": "y-coordinate of the center of the region in microns",
     "mode": "REQUIRED",
-    "name": "y_region",
+    "name": "y_region_microns",
     "type": "FLOAT"
   },
   {
-    "description": "z-coordinate of the center of the region",
+    "description": "z-coordinate of the center of the region in microns",
     "mode": "OPTIONAL",
-    "name": "z_region",
+    "name": "z_region_microns",
     "type": "FLOAT"
   },
   {
@@ -56,7 +56,7 @@
   {
     "description": "area of the region in square micrometers",
     "mode": "OPTIONAL",
-    "name": "area_um2",
+    "name": "area_sq_microns",
     "type": "FLOAT"
   }
 ]

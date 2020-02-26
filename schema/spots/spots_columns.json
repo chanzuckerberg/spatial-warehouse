@@ -6,21 +6,21 @@
     "type": "STRING"
   },
   {
-    "description": "y-coordinate of the center of the spot",
+    "description": "y-coordinate of the center of the spot in microns",
     "mode": "REQUIRED",
-    "name": "y_spot",
+    "name": "y_spot_microns",
     "type": "FLOAT"
   },
   {
-    "description": "x-coordinate of the center of the spot",
+    "description": "x-coordinate of the center of the spot in microns",
     "mode": "REQUIRED",
-    "name": "x_spot",
+    "name": "x_spot_microns",
     "type": "FLOAT"
   },
   {
-    "description": "z-coordinate of the center of the spot",
+    "description": "z-coordinate of the center of the spot in microns",
     "mode": "OPTIONAL",
-    "name": "z_spot",
+    "name": "z_spot_microns",
     "type": "FLOAT"
   },
   {
@@ -30,21 +30,21 @@
     "type": "INT"
   },
   {
-    "description": "z-coordinate of the region this spot falls inside",
+    "description": "z-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
-    "name": "z_region",
+    "name": "z_region_microns",
     "type": "FLOAT"
   },
   {
-    "description": "y-coordinate of the region this spot falls inside",
+    "description": "y-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
-    "name": "y_region",
+    "name": "y_region_microns",
     "type": "FLOAT"
   },
   {
-    "description": "x-coordinate of the region this spot falls inside",
+    "description": "x-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
-    "name": "x_region",
+    "name": "x_region_microns",
     "type": "FLOAT"
   },
   {

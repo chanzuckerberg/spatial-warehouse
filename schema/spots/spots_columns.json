@@ -24,6 +24,24 @@
     "type": "FLOAT"
   },
   {
+    "description": "y-coordinate of the center of the spot in pixels",
+    "mode": "REQUIRED",
+    "name": "y_spot_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the center of the spot in pixels",
+    "mode": "REQUIRED",
+    "name": "x_spot_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the center of the spot in pixels",
+    "mode": "OPTIONAL",
+    "name": "z_spot_pixels",
+    "type": "FLOAT"
+  },
+  {
     "description": "id of the region (e.g. cell) that this spot belongs to",
     "mode": "OPTIONAL",
     "name": "region_id",
@@ -45,6 +63,24 @@
     "description": "x-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
     "name": "x_region_microns",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the region this spot falls inside in pixels",
+    "mode": "OPTIONAL",
+    "name": "z_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "y-coordinate of the region this spot falls inside in pixels",
+    "mode": "OPTIONAL",
+    "name": "y_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the region this spot falls inside in pixels",
+    "mode": "OPTIONAL",
+    "name": "x_region_pixels",
     "type": "FLOAT"
   },
   {

@@ -24,6 +24,24 @@
     "type": "FLOAT"
   },
   {
+    "description": "x-coordinate of the center of the region, in pixels",
+    "mode": "OPTIONAL",
+    "name": "x_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "y-coordinate of the center of the region in pixels",
+    "mode": "OPTIONAL",
+    "name": "y_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the center of the region in pixels",
+    "mode": "OPTIONAL",
+    "name": "z_region_pixels",
+    "type": "FLOAT"
+  },
+  {
     "description": "physical annotation for the region, e.g. 'brain white matter'",
     "mode": "OPTIONAL",
     "name": "physical_annotation",

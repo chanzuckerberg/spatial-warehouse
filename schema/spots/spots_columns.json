@@ -48,12 +48,6 @@
     "type": "INT"
   },
   {
-    "description": "z-coordinate of the region this spot falls inside in microns",
-    "mode": "OPTIONAL",
-    "name": "z_region_microns",
-    "type": "FLOAT"
-  },
-  {
     "description": "y-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
     "name": "y_region_microns",
@@ -66,9 +60,9 @@
     "type": "FLOAT"
   },
   {
-    "description": "z-coordinate of the region this spot falls inside in pixels",
+    "description": "z-coordinate of the region this spot falls inside in microns",
     "mode": "OPTIONAL",
-    "name": "z_region_pixels",
+    "name": "z_region_microns",
     "type": "FLOAT"
   },
   {
@@ -81,6 +75,12 @@
     "description": "x-coordinate of the region this spot falls inside in pixels",
     "mode": "OPTIONAL",
     "name": "x_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "z-coordinate of the region this spot falls inside in pixels",
+    "mode": "OPTIONAL",
+    "name": "z_region_pixels",
     "type": "FLOAT"
   },
   {

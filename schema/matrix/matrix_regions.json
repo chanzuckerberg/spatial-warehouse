@@ -6,15 +6,15 @@
     "type": "INT"
   },
   {
-    "description": "x-coordinate of the center of the region, in microns",
-    "mode": "REQUIRED",
-    "name": "x_region_microns",
-    "type": "FLOAT"
-  },
-  {
     "description": "y-coordinate of the center of the region in microns",
     "mode": "REQUIRED",
     "name": "y_region_microns",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the center of the region, in microns",
+    "mode": "REQUIRED",
+    "name": "x_region_microns",
     "type": "FLOAT"
   },
   {
@@ -24,15 +24,15 @@
     "type": "FLOAT"
   },
   {
-    "description": "x-coordinate of the center of the region, in pixels",
-    "mode": "OPTIONAL",
-    "name": "x_region_pixels",
-    "type": "FLOAT"
-  },
-  {
     "description": "y-coordinate of the center of the region in pixels",
     "mode": "OPTIONAL",
     "name": "y_region_pixels",
+    "type": "FLOAT"
+  },
+  {
+    "description": "x-coordinate of the center of the region, in pixels",
+    "mode": "OPTIONAL",
+    "name": "x_region_pixels",
     "type": "FLOAT"
   },
   {

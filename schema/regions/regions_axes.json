@@ -12,15 +12,21 @@
     "type": "STRING"
   },
   {
-    "description": "regions pixel size x",
+    "description": "name of regions z-axis",
     "mode": "OPTIONAL",
-    "name": "region_pixel_size_x",
-    "type": "FLOAT"
+    "name": "z_region",
+    "type": "STRING"
   },
   {
     "description": "regions pixel size y",
     "mode": "OPTIONAL",
     "name": "region_pixel_size_y",
+    "type": "FLOAT"
+  },
+  {
+    "description": "regions pixel size x",
+    "mode": "OPTIONAL",
+    "name": "region_pixel_size_x",
     "type": "FLOAT"
   },
   {
